@@ -3,7 +3,7 @@ ARG DEBIAN_VERSION=13-slim
 FROM debian:${DEBIAN_VERSION} AS builder
 
 ARG NGINX_VERSION=1.30.3
-ARG NGINX_SHA256=e2e48c16e56426f754c3dca5628e0993290bf41b108ae47242f413a8a734d9ae
+ARG NGINX_SHA256=e5823dc6f45610993def93ebf6cfce68264af4958c77e874b7d20f3709001b8f
 ARG NGINX_RTMP_VERSION=1.2.2
 ARG NGINX_RTMP_COMMIT=23e1873aa62acb58b7881eed2a501f5bf35b82e9
 ARG NGINX_RTMP_SHA256=b688919355c0acccdda24eb83c6306df3d450cb0b13664f16b8e3d1f521c3bb5
@@ -23,12 +23,14 @@ WORKDIR /tmp/build
 RUN curl --fail --location --show-error --silent --retry 5 --retry-all-errors \
         "https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" \
         --output nginx.tar.gz \
-    && echo "${NGINX_SHA256}  nginx.tar.gz" | sha256sum --check --strict \
-    && curl --fail --location --show-error --silent --retry 5 --retry-all-errors \
+    && echo "${NGINX_SHA256}  nginx.tar.gz" | sha256sum --check --strict
+
+RUN curl --fail --location --show-error --silent --retry 5 --retry-all-errors \
         "https://codeload.github.com/arut/nginx-rtmp-module/tar.gz/${NGINX_RTMP_COMMIT}" \
         --output nginx-rtmp.tar.gz \
-    && echo "${NGINX_RTMP_SHA256}  nginx-rtmp.tar.gz" | sha256sum --check --strict \
-    && mkdir nginx nginx-rtmp \
+    && echo "${NGINX_RTMP_SHA256}  nginx-rtmp.tar.gz" | sha256sum --check --strict
+
+RUN mkdir nginx nginx-rtmp \
     && tar --extract --gzip --file nginx.tar.gz --directory nginx --strip-components=1 \
     && tar --extract --gzip --file nginx-rtmp.tar.gz --directory nginx-rtmp --strip-components=1
 

@@ -1,6 +1,6 @@
 # RTMP Relay Manager
 
-[English README](README.md)
+[English README](README.md) · [Docker Hub：raykimurayyz/nginx-rtmp](https://hub.docker.com/r/raykimurayyz/nginx-rtmp)
 
 这是一个适合自行部署的轻量直播转推管理工具。它接收一路 RTMP 直播流，通过网页配置将直播同时转推到一个或多个国内外直播平台。项目面向可信局域网使用，把 NGINX、nginx-rtmp-module 和无第三方依赖的管理服务打包在一个 Docker 镜像中。
 

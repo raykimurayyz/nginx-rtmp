@@ -110,15 +110,20 @@ Stream keys are stored as plain text in `/data/config.json` inside the Docker vo
 Two workflows are included:
 
 - **CI** runs Python unit tests and builds the container for every pull request and push to `main`.
-- **Publish container** builds and publishes AMD64 and ARM64 images to GitHub Container Registry on `main`, version tags such as `v1.0.0`, or manual dispatch.
+- **Publish to Docker Hub** builds and publishes AMD64 and ARM64 images to Docker Hub on `main`, version tags such as `v1.0.0`, or manual dispatch.
 
-The published image name is:
+Before running the publishing workflow, create these GitHub Actions repository secrets:
+
+- `DOCKERHUB_USERNAME`: your Docker Hub username
+- `DOCKERHUB_TOKEN`: a Docker Hub personal access token with permission to write images
+
+The workflow uses the GitHub repository name as the Docker Hub repository name. The published image name is:
 
 ```text
-ghcr.io/OWNER/REPOSITORY
+DOCKERHUB_USERNAME/GITHUB_REPOSITORY_NAME
 ```
 
-Repository settings may require the first package to be made public manually if anonymous image pulls are desired.
+Create that repository in Docker Hub before the first publish, and make it public if anonymous image pulls are desired.
 
 Suggested release flow:
 
@@ -165,4 +170,3 @@ docker-compose.yml     Local deployment
 ## License status
 
 No license has yet been assigned to the original code in this repository. NGINX and nginx-rtmp-module remain subject to their respective 2-clause BSD licenses. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-

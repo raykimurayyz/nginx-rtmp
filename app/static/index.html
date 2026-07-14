@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="局域网 RTMP 多平台转推管理面板">
+    <title>RTMP Relay Manager</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="RTMP Relay Manager 首页">
+          <span class="brand-mark"><span></span></span>
+          <span>RTMP <b>RELAY</b></span>
+        </a>
+        <div class="connection" id="connection-pill">
+          <span class="status-dot"></span>
+          <span id="connection-text">正在连接</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">PRIVATE STREAM GATEWAY</p>
+            <h1>一条直播流，<br><em>转推到多个平台。</em></h1>
+            <p class="hero-description">将 PS5、OBS 或其他设备推送到这里，再由 Nginx RTMP 安全转发到已启用的直播平台。</p>
+          </div>
+          <div class="ingest-card">
+            <div class="ingest-card-head">
+              <span>本机推流地址</span>
+              <span class="live-badge" id="live-badge">等待直播流</span>
+            </div>
+            <div class="url-box">
+              <code id="ingest-url">rtmp://localhost:1935/live</code>
+              <button class="icon-button" id="copy-url" type="button" aria-label="复制推流地址" title="复制">复制</button>
+            </div>
+            <p>在推流软件中填写此服务器地址，串流名称可以自定义。</p>
+          </div>
+        </section>
+
+        <section class="metrics" aria-label="运行状态">
+          <article class="metric">
+            <span class="metric-label">网关状态</span>
+            <strong id="gateway-status">检查中</strong>
+            <small id="gateway-detail">正在读取 Nginx 状态</small>
+          </article>
+          <article class="metric">
+            <span class="metric-label">输入直播流</span>
+            <strong id="stream-count">0</strong>
+            <small id="stream-detail">暂未收到直播</small>
+          </article>
+          <article class="metric">
+            <span class="metric-label">启用的目的地</span>
+            <strong id="destination-count">0</strong>
+            <small>支持同时转推</small>
+          </article>
+        </section>
+
+        <section class="workspace">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">DESTINATIONS</p>
+              <h2>推流目的地</h2>
+              <p>填写平台提供的 RTMP 服务器地址和串流密钥。</p>
+            </div>
+            <button class="primary-button" id="add-destination" type="button"><span>＋</span> 添加平台</button>
+          </div>
+
+          <div class="destination-list" id="destination-list"></div>
+          <div class="empty-state" id="empty-state">
+            <div class="empty-icon">↗</div>
+            <h3>还没有推流目的地</h3>
+            <p>添加哔哩哔哩、斗鱼、虎牙或其他支持 RTMP 的直播平台。</p>
+            <button class="secondary-button" id="empty-add" type="button">添加第一个平台</button>
+          </div>
+        </section>
+
+        <section class="stream-panel" id="stream-panel" hidden>
+          <div class="section-heading compact">
+            <div>
+              <p class="eyebrow">LIVE INPUT</p>
+              <h2>当前直播流</h2>
+            </div>
+          </div>
+          <div id="stream-list" class="stream-list"></div>
+        </section>
+      </main>
+
+      <footer>
+        <span>RTMP Relay Manager</span>
+        <span>仅建议在可信局域网中使用</span>
+      </footer>
+    </div>
+
+    <dialog id="destination-dialog">
+      <form method="dialog" id="destination-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">DESTINATION</p>
+            <h2 id="dialog-title">添加推流平台</h2>
+          </div>
+          <button class="close-button" value="cancel" aria-label="关闭" type="submit">×</button>
+        </div>
+        <input type="hidden" id="destination-id">
+        <label>
+          <span>平台名称</span>
+          <input id="destination-name" maxlength="60" placeholder="例如：哔哩哔哩" required autocomplete="off">
+        </label>
+        <label>
+          <span>RTMP 服务器地址</span>
+          <input id="server-url" type="url" maxlength="1024" placeholder="rtmp://live-push.example.com/live" required spellcheck="false" autocomplete="off">
+          <small>填写平台提供的服务器地址，目前支持 RTMP。</small>
+        </label>
+        <label>
+          <span>串流密钥</span>
+          <div class="secret-input">
+            <input id="stream-key" type="password" maxlength="1024" placeholder="填写平台提供的串流密钥" spellcheck="false" autocomplete="new-password">
+            <button type="button" id="toggle-key">显示</button>
+          </div>
+          <small id="key-help">密钥只保存在本机 Docker 数据卷中。</small>
+        </label>
+        <label class="switch-row">
+          <span>
+            <b>立即启用</b>
+            <small>收到直播流后自动向该平台转推</small>
+          </span>
+          <input id="destination-enabled" type="checkbox" checked>
+        </label>
+        <div class="dialog-actions">
+          <button class="secondary-button" value="cancel" type="submit">取消</button>
+          <button class="primary-button" id="save-destination" value="default" type="submit">保存并应用</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
+

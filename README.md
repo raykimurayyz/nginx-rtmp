@@ -109,8 +109,8 @@ Stream keys are stored as plain text in `/data/config.json` inside the Docker vo
 
 Two workflows are included:
 
-- **CI** runs Python unit tests and builds the container for every pull request and push to `main`.
-- **Publish to Docker Hub** builds and publishes AMD64 and ARM64 images to Docker Hub on `main`, version tags such as `v1.0.0`, or manual dispatch.
+- **CI** runs Python unit tests for pull requests and pushes to `main`; the container validation build runs only for pull requests.
+- **Publish to Docker Hub** builds and publishes AMD64 and ARM64 images only when a strict `vX.Y.Z` tag such as `v1.0.0` is pushed, or when manually dispatched. Merging to `main` does not publish an image.
 
 Before running the publishing workflow, create these GitHub Actions repository secrets:
 
@@ -132,7 +132,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-The workflow publishes version, major/minor, tag, and `latest` aliases as applicable, plus SBOM and provenance attestations. Dependabot checks Docker and GitHub Actions dependencies monthly.
+For a tag such as `v1.2.3`, the workflow publishes `v1.2.3`, `1.2.3`, `1.2`, and `latest`, plus SBOM and provenance attestations. Dependabot checks Docker and GitHub Actions dependencies monthly.
 
 ## Updating NGINX or nginx-rtmp-module
 

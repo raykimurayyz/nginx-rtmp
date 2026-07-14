@@ -1,6 +1,6 @@
 # RTMP Relay Manager
 
-[中文说明](README.zh-CN.md)
+[中文说明](README.zh-CN.md) · [Docker Hub: raykimurayyz/nginx-rtmp](https://hub.docker.com/r/raykimurayyz/nginx-rtmp)
 
 A small, self-hosted web interface for receiving one RTMP input and relaying it to one or more streaming platforms. It is designed for trusted private networks and packages NGINX, nginx-rtmp-module, and a dependency-free management service into one Docker image.
 

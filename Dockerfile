@@ -68,6 +68,7 @@ LABEL org.opencontainers.image.title="RTMP Relay Manager" \
       io.github.rtmp-relay-manager.nginx-rtmp-module.version="${NGINX_RTMP_VERSION}"
 
 RUN apt-get -o Acquire::Retries=5 update \
+    && apt-get -o Acquire::Retries=5 upgrade --yes \
     && apt-get -o Acquire::Retries=5 install --yes --no-install-recommends \
         ca-certificates \
         libpcre2-8-0 \

@@ -1,37 +1,36 @@
-ARG DEBIAN_VERSION=13-slim
-ARG DEBIAN_MIRROR=deb.debian.org
+ARG ALPINE_VERSION=3.24
+ARG ALPINE_MIRROR=dl-cdn.alpinelinux.org
 
-FROM debian:${DEBIAN_VERSION} AS builder
+FROM alpine:${ALPINE_VERSION} AS builder
 
-ARG DEBIAN_MIRROR
+ARG ALPINE_MIRROR
 ARG NGINX_VERSION=1.30.3
 ARG NGINX_SHA256=e5823dc6f45610993def93ebf6cfce68264af4958c77e874b7d20f3709001b8f
 ARG NGINX_RTMP_VERSION=1.2.2
 ARG NGINX_RTMP_COMMIT=23e1873aa62acb58b7881eed2a501f5bf35b82e9
 ARG NGINX_RTMP_SHA256=b688919355c0acccdda24eb83c6306df3d450cb0b13664f16b8e3d1f521c3bb5
 
-RUN sed -i "s|deb.debian.org|${DEBIAN_MIRROR}|g" /etc/apt/sources.list.d/debian.sources \
-    && apt-get -o Acquire::Retries=5 update \
-    && apt-get -o Acquire::Retries=5 install --yes --no-install-recommends \
-        build-essential \
+RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories \
+    && apk add --no-cache \
+        build-base \
         ca-certificates \
         curl \
-        libpcre2-dev \
-        libssl-dev \
-        zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/*
+        linux-headers \
+        openssl-dev \
+        pcre2-dev \
+        zlib-dev
 
 WORKDIR /tmp/build
 
 RUN curl --fail --location --show-error --silent --retry 5 --retry-all-errors \
         "https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz" \
         --output nginx.tar.gz \
-    && echo "${NGINX_SHA256}  nginx.tar.gz" | sha256sum --check --strict
+    && echo "${NGINX_SHA256}  nginx.tar.gz" | sha256sum -c
 
 RUN curl --fail --location --show-error --silent --retry 5 --retry-all-errors \
         "https://codeload.github.com/arut/nginx-rtmp-module/tar.gz/${NGINX_RTMP_COMMIT}" \
         --output nginx-rtmp.tar.gz \
-    && echo "${NGINX_RTMP_SHA256}  nginx-rtmp.tar.gz" | sha256sum --check --strict
+    && echo "${NGINX_RTMP_SHA256}  nginx-rtmp.tar.gz" | sha256sum -c
 
 RUN mkdir nginx nginx-rtmp \
     && tar --extract --gzip --file nginx.tar.gz --directory nginx --strip-components=1 \
@@ -62,9 +61,9 @@ RUN ./configure \
     && make install \
     && strip /usr/local/sbin/nginx
 
-FROM debian:${DEBIAN_VERSION} AS runtime
+FROM alpine:${ALPINE_VERSION} AS runtime
 
-ARG DEBIAN_MIRROR
+ARG ALPINE_MIRROR
 ARG NGINX_VERSION=1.30.3
 ARG NGINX_RTMP_VERSION=1.2.2
 
@@ -73,18 +72,17 @@ LABEL org.opencontainers.image.title="RTMP Relay Manager" \
       io.github.rtmp-relay-manager.nginx.version="${NGINX_VERSION}" \
       io.github.rtmp-relay-manager.nginx-rtmp-module.version="${NGINX_RTMP_VERSION}"
 
-RUN sed -i "s|deb.debian.org|${DEBIAN_MIRROR}|g" /etc/apt/sources.list.d/debian.sources \
-    && apt-get -o Acquire::Retries=5 update \
-    && apt-get -o Acquire::Retries=5 upgrade --yes \
-    && apt-get -o Acquire::Retries=5 install --yes --no-install-recommends \
+RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories \
+    && apk upgrade --no-cache \
+    && apk add --no-cache \
         ca-certificates \
-        libpcre2-8-0 \
+        libcrypto3 \
         libssl3 \
+        pcre2 \
         python3 \
-        zlib1g \
-    && rm -rf /var/lib/apt/lists/* \
-    && groupadd --gid 10001 streamer \
-    && useradd --uid 10001 --gid streamer --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin streamer \
+        zlib \
+    && addgroup -S -g 10001 streamer \
+    && adduser -S -D -H -u 10001 -G streamer -s /sbin/nologin streamer \
     && mkdir -p /data /etc/nginx/generated /opt/relay-manager/static /usr/share/licenses/nginx /usr/share/licenses/nginx-rtmp-module \
     && chown -R streamer:streamer /data /etc/nginx/generated
 

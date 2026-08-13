@@ -11,7 +11,8 @@ A lightweight, Dockerized NGINX RTMP relay with a simple web interface for multi
 - Relay one input stream to multiple RTMP platforms simultaneously.
 - Enable, disable, edit, and remove destinations without manually editing NGINX.
 - Validate configuration before applying changes and restore the previous configuration on failure.
-- View NGINX health, active streams, bitrate, duration, and client count.
+- Monitor NGINX health, aggregate and per-stream traffic, transfer totals, media metadata, and RTMP connections.
+- Keep client IP addresses masked by default and reveal them temporarily when troubleshooting.
 - Run as a non-root user on both AMD64 and ARM64 systems.
 
 ## Quick start
@@ -117,4 +118,3 @@ The image builds verified upstream releases of NGINX and nginx-rtmp-module. Thei
 Full documentation, source code, license notices, issue tracking, and release workflow are available on GitHub:
 
 **[github.com/raykimurayyz/nginx-rtmp](https://github.com/raykimurayyz/nginx-rtmp)**
-

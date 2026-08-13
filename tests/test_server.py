@@ -115,6 +115,52 @@ class ValidationTests(unittest.TestCase):
         self.assertNotIn("super-secret-value", repr(public))
 
 
+class RtmpStatusTests(unittest.TestCase):
+    def test_parses_stream_media_traffic_and_connections(self):
+        payload = b"""<?xml version="1.0"?>
+        <rtmp>
+          <nginx_version>1.28.0</nginx_version>
+          <nginx_rtmp_version>1.2.2</nginx_rtmp_version>
+          <uptime>3601</uptime><naccepted>9</naccepted>
+          <bw_in>6000000</bw_in><bytes_in>1048576</bytes_in>
+          <bw_out>12000000</bw_out><bytes_out>2097152</bytes_out>
+          <server><application><name>live</name><live><stream>
+            <name>camera</name><time>65000</time>
+            <bw_in>6000000</bw_in><bytes_in>1048576</bytes_in>
+            <bw_out>12000000</bw_out><bytes_out>2097152</bytes_out>
+            <bw_video>5800000</bw_video><bw_audio>200000</bw_audio>
+            <meta><video><codec>H264</codec><profile>High</profile><level>4.1</level>
+              <width>1920</width><height>1080</height><frame_rate>60</frame_rate></video>
+              <audio><codec>AAC</codec><profile>LC</profile><sample_rate>48000</sample_rate>
+              <channels>2</channels></audio></meta>
+            <client><id>7</id><address>192.168.1.20</address><time>65000</time>
+              <dropped>3</dropped><avsync>-12</avsync><timestamp>64000</timestamp>
+              <publishing/><active/></client>
+            <nclients>1</nclients><publishing/><active/>
+          </stream></live></application></server>
+        </rtmp>"""
+
+        result = server.parse_rtmp_status(payload)
+
+        self.assertEqual(result["runtime"]["acceptedConnections"], 9)
+        stream = result["activeStreams"][0]
+        self.assertEqual(stream["bandwidthIn"], 6000000)
+        self.assertEqual(stream["video"]["width"], 1920)
+        self.assertEqual(stream["audio"]["sampleRate"], 48000)
+        self.assertEqual(stream["connections"][0]["address"], "192.168.1.20")
+        self.assertEqual(stream["connections"][0]["role"], "publishing")
+        self.assertTrue(stream["connections"][0]["active"])
+
+    def test_missing_optional_metadata_is_returned_as_null(self):
+        payload = b"<rtmp><server><application><live><stream><name>test</name>"
+        payload += b"<nclients>0</nclients></stream></live></application></server></rtmp>"
+
+        stream = server.parse_rtmp_status(payload)["activeStreams"][0]
+
+        self.assertIsNone(stream["video"]["codec"])
+        self.assertIsNone(stream["audio"]["sampleRate"])
+        self.assertEqual(stream["connections"], [])
+
+
 if __name__ == "__main__":
     unittest.main()
-

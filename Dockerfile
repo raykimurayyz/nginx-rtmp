@@ -69,6 +69,7 @@ ARG NGINX_RTMP_VERSION=1.2.2
 
 LABEL org.opencontainers.image.title="RTMP Relay Manager" \
       org.opencontainers.image.description="Web-managed NGINX RTMP relay for private networks" \
+      org.opencontainers.image.licenses="MIT" \
       io.github.rtmp-relay-manager.nginx.version="${NGINX_VERSION}" \
       io.github.rtmp-relay-manager.nginx-rtmp-module.version="${NGINX_RTMP_VERSION}"
 
@@ -83,10 +84,11 @@ RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories \
         zlib \
     && addgroup -S -g 10001 streamer \
     && adduser -S -D -H -u 10001 -G streamer -s /sbin/nologin streamer \
-    && mkdir -p /data /etc/nginx/generated /opt/relay-manager/static /usr/share/licenses/nginx /usr/share/licenses/nginx-rtmp-module \
+    && mkdir -p /data /etc/nginx/generated /opt/relay-manager/static /usr/share/licenses/rtmp-relay-manager /usr/share/licenses/nginx /usr/share/licenses/nginx-rtmp-module \
     && chown -R streamer:streamer /data /etc/nginx/generated
 
 COPY --from=builder /usr/local/sbin/nginx /usr/local/sbin/nginx
+COPY LICENSE /usr/share/licenses/rtmp-relay-manager/LICENSE
 COPY --from=builder /tmp/build/nginx/LICENSE /usr/share/licenses/nginx/LICENSE
 COPY --from=builder /tmp/build/nginx-rtmp/LICENSE /usr/share/licenses/nginx-rtmp-module/LICENSE
 COPY nginx/nginx.conf /etc/nginx/nginx.conf

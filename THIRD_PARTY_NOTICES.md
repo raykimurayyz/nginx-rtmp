@@ -2,6 +2,8 @@
 
 This project downloads and builds the following unmodified upstream components during the container build. Their source code is not vendored in this repository.
 
+The MIT License in the repository root applies only to the original RTMP Relay Manager code. The components below retain their own license terms.
+
 ## NGINX
 
 - Project: https://nginx.org/
@@ -16,4 +18,4 @@ This project downloads and builds the following unmodified upstream components d
 - License: 2-clause BSD license
 - License text: https://github.com/arut/nginx-rtmp-module/blob/master/LICENSE
 
-The container image includes the license texts at `/usr/share/licenses/nginx/LICENSE` and `/usr/share/licenses/nginx-rtmp-module/LICENSE`.
+The container image includes the project and third-party license texts under `/usr/share/licenses/`.

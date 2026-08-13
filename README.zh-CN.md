@@ -168,6 +168,8 @@ Dockerfile             可复现的上游组件构建和运行镜像
 docker-compose.yml     本地部署配置
 ```
 
-## 项目许可证状态
+## 许可证
 
-当前尚未给本仓库的原创代码指定许可证。NGINX 与 nginx-rtmp-module 继续分别遵循各自的 BSD 2-Clause 许可证，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+本仓库的原创代码采用 [MIT License](LICENSE)。
+
+NGINX 和 nginx-rtmp-module 属于第三方组件，分别继续遵循各自的 BSD 2-Clause 许可证，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

@@ -251,25 +251,105 @@ def text_of(node: ET.Element, name: str, default: str = "0") -> str:
     return child.text if child is not None and child.text is not None else default
 
 
+def int_of(node: ET.Element, name: str, default: int = 0) -> int:
+    try:
+        return int(text_of(node, name, str(default)))
+    except (TypeError, ValueError):
+        return default
+
+
+def optional_int_of(node: ET.Element, name: str) -> int | None:
+    child = node.find(name)
+    if child is None or child.text is None or child.text.strip() == "":
+        return None
+    try:
+        return int(float(child.text))
+    except (TypeError, ValueError):
+        return None
+
+
+def optional_text_of(node: ET.Element, name: str) -> str | None:
+    child = node.find(name)
+    if child is None or child.text is None:
+        return None
+    value = child.text.strip()
+    return value or None
+
+
+def parse_rtmp_status(payload: bytes) -> dict[str, Any]:
+    root = ET.fromstring(payload)
+    streams = []
+    for stream in root.findall("./server/application/live/stream"):
+        video = stream.find("./meta/video")
+        audio = stream.find("./meta/audio")
+        clients = []
+        for client in stream.findall("./client"):
+            clients.append(
+                {
+                    "id": text_of(client, "id", "unknown"),
+                    "address": optional_text_of(client, "address"),
+                    "timeMs": int_of(client, "time"),
+                    "dropped": int_of(client, "dropped"),
+                    "avSyncMs": optional_int_of(client, "avsync"),
+                    "timestampMs": optional_int_of(client, "timestamp"),
+                    "role": "publishing" if client.find("publishing") is not None else "playing",
+                    "active": client.find("active") is not None,
+                }
+            )
+
+        streams.append(
+            {
+                "name": text_of(stream, "name", "unknown"),
+                "timeMs": int_of(stream, "time"),
+                "bandwidthIn": int_of(stream, "bw_in"),
+                "bytesIn": int_of(stream, "bytes_in"),
+                "bandwidthOut": int_of(stream, "bw_out"),
+                "bytesOut": int_of(stream, "bytes_out"),
+                "clients": int_of(stream, "nclients"),
+                "publishing": stream.find("publishing") is not None,
+                "active": stream.find("active") is not None,
+                "video": {
+                    "codec": optional_text_of(video, "codec") if video is not None else None,
+                    "profile": optional_text_of(video, "profile") if video is not None else None,
+                    "level": optional_text_of(video, "level") if video is not None else None,
+                    "width": optional_int_of(video, "width") if video is not None else None,
+                    "height": optional_int_of(video, "height") if video is not None else None,
+                    "frameRate": optional_int_of(video, "frame_rate") if video is not None else None,
+                    "bitrate": optional_int_of(stream, "bw_video"),
+                },
+                "audio": {
+                    "codec": optional_text_of(audio, "codec") if audio is not None else None,
+                    "profile": optional_text_of(audio, "profile") if audio is not None else None,
+                    "sampleRate": optional_int_of(audio, "sample_rate") if audio is not None else None,
+                    "channels": optional_int_of(audio, "channels") if audio is not None else None,
+                    "bitrate": optional_int_of(stream, "bw_audio"),
+                },
+                "connections": clients,
+            }
+        )
+
+    return {
+        "nginx": "online",
+        "runtime": {
+            "nginxVersion": optional_text_of(root, "nginx_version"),
+            "rtmpVersion": optional_text_of(root, "nginx_rtmp_version"),
+            "uptimeSeconds": int_of(root, "uptime"),
+            "acceptedConnections": int_of(root, "naccepted"),
+            "bandwidthIn": int_of(root, "bw_in"),
+            "bytesIn": int_of(root, "bytes_in"),
+            "bandwidthOut": int_of(root, "bw_out"),
+            "bytesOut": int_of(root, "bytes_out"),
+        },
+        "activeStreams": streams,
+        "checkedAt": int(time.time()),
+    }
+
+
 def fetch_rtmp_status() -> dict[str, Any]:
     try:
         with urlopen("http://127.0.0.1:8081/stat", timeout=1.5) as response:
             payload = response.read(1024 * 1024)
-        root = ET.fromstring(payload)
-        streams = []
-        for stream in root.findall("./server/application/live/stream"):
-            streams.append(
-                {
-                    "name": text_of(stream, "name", "unknown"),
-                    "timeMs": int(text_of(stream, "time")),
-                    "bandwidthIn": int(text_of(stream, "bw_in")),
-                    "bytesIn": int(text_of(stream, "bytes_in")),
-                    "bandwidthOut": int(text_of(stream, "bw_out")),
-                    "bytesOut": int(text_of(stream, "bytes_out")),
-                    "clients": int(text_of(stream, "nclients")),
-                }
-            )
-        return {"nginx": "online", "activeStreams": streams, "checkedAt": int(time.time())}
+        return parse_rtmp_status(payload)
     except Exception as exc:  # Status must remain best-effort.
         LOGGER.debug("RTMP status unavailable: %s", exc)
         return {"nginx": "offline", "activeStreams": [], "checkedAt": int(time.time())}

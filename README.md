@@ -14,7 +14,8 @@ The project does **not** vendor or modify NGINX or nginx-rtmp-module source code
 - Keep stream keys out of API responses and the browser after they are saved.
 - Validate generated configuration with `nginx -t` before applying it.
 - Restore the previous configuration if validation or reload fails.
-- Display NGINX health, active input streams, bitrate, duration, and client count.
+- Monitor NGINX health, aggregate and per-stream traffic, transfer totals, media metadata, and RTMP connections.
+- Mask client IP addresses by default, with an on-page control for temporary full-address display.
 - Run as an unprivileged user with all Linux capabilities dropped by Compose.
 - Build multi-platform images for `linux/amd64` and `linux/arm64` in GitHub Actions.
 
@@ -22,7 +23,7 @@ The project does **not** vendor or modify NGINX or nginx-rtmp-module source code
 
 | Component | Version | Source |
 | --- | --- | --- |
-| Debian | 13 Slim | Official Debian image |
+| Alpine Linux | 3.24 | Official Alpine image |
 | NGINX | 1.30.3 stable | `nginx.org` release archive |
 | nginx-rtmp-module | 1.2.2 | Upstream tagged commit |
 

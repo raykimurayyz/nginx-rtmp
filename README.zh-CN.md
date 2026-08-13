@@ -14,7 +14,8 @@
 - 串流密钥保存后不再通过 API 返回给浏览器。
 - 应用配置前执行 `nginx -t` 检查。
 - 检查或重载失败时自动恢复原配置。
-- 显示 NGINX 状态、当前直播流、码率、持续时间和客户端数量。
+- 显示 NGINX 状态、整体及单流输入/输出码率、累计流量、媒体参数和 RTMP 连接详情。
+- 客户端 IP 默认脱敏，可在页面中临时切换为完整地址。
 - 容器使用非 root 用户运行，Compose 会移除全部 Linux capabilities。
 - GitHub Actions 自动构建 `linux/amd64` 和 `linux/arm64` 镜像。
 
@@ -22,7 +23,7 @@
 
 | 组件 | 版本 | 来源 |
 | --- | --- | --- |
-| Debian | 13 Slim | Debian 官方镜像 |
+| Alpine Linux | 3.24 | Alpine 官方镜像 |
 | NGINX | 1.30.3 stable | `nginx.org` 官方发布包 |
 | nginx-rtmp-module | 1.2.2 | 上游正式标签对应的固定提交 |
 

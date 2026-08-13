@@ -37,12 +37,48 @@ const TRANSLATIONS = {
     'empty.title': 'No relay destinations yet',
     'empty.description': 'Add YouTube, Twitch, or any other platform that supports RTMP.',
     'empty.add': 'Add the first platform',
-    'streams.eyebrow': 'LIVE INPUT',
-    'streams.title': 'Current live streams',
+    'streams.eyebrow': 'RTMP STATISTICS',
+    'streams.title': 'RTMP runtime status',
+    'streams.none': 'No active live streams.',
+    'streams.uptime': 'Nginx uptime',
+    'streams.accepted': 'Accepted connections',
+    'streams.globalIn': 'Total input rate',
+    'streams.globalOut': 'Total output rate',
+    'streams.totalReceived': 'Total received',
+    'streams.totalSent': 'Total sent',
     'streams.name': 'Stream name',
+    'streams.state': 'State',
+    'streams.active': 'Active',
+    'streams.idle': 'Idle',
     'streams.duration': 'Duration',
-    'streams.bitrate': 'Input bitrate',
+    'streams.inputRate': 'Input bitrate',
+    'streams.outputRate': 'Output bitrate',
+    'streams.received': 'Received',
+    'streams.sent': 'Sent',
     'streams.clients': 'Clients',
+    'streams.mediaDetails': 'Media details',
+    'streams.video': 'Video',
+    'streams.audio': 'Audio',
+    'streams.codec': 'Codec',
+    'streams.resolution': 'Resolution',
+    'streams.frameRate': 'Frame rate',
+    'streams.sampleRate': 'Sample rate',
+    'streams.channels': 'Channels',
+    'streams.bitrate': 'Bitrate',
+    'streams.connectionDetails': 'Connection details',
+    'streams.showFullIps': 'Show full IPs',
+    'streams.hideFullIps': 'Hide full IPs',
+    'streams.connectionId': 'ID',
+    'streams.role': 'Role',
+    'streams.address': 'Client IP',
+    'streams.connectionState': 'Connection',
+    'streams.dropped': 'Dropped',
+    'streams.avSync': 'A/V sync',
+    'streams.publishing': 'Publishing input',
+    'streams.playing': 'Playing / relay',
+    'streams.connected': 'Connected',
+    'streams.inactive': 'Inactive',
+    'streams.noConnections': 'No connection details available.',
     'footer.security': 'Recommended for trusted local networks only',
     'footer.developedBy': 'Developed by',
     'footer.source': 'GitHub source',
@@ -122,12 +158,48 @@ const TRANSLATIONS = {
     'empty.title': '配信先がありません',
     'empty.description': 'YouTube、Twitch、その他RTMP対応の配信先を追加してください。',
     'empty.add': '最初の配信先を追加',
-    'streams.eyebrow': 'ライブ入力',
-    'streams.title': '現在のライブ配信',
+    'streams.eyebrow': 'RTMP 統計',
+    'streams.title': 'RTMP 稼働状況',
+    'streams.none': '現在ライブ配信はありません。',
+    'streams.uptime': 'Nginx 稼働時間',
+    'streams.accepted': '累計接続数',
+    'streams.globalIn': '入力合計レート',
+    'streams.globalOut': '出力合計レート',
+    'streams.totalReceived': '累計受信量',
+    'streams.totalSent': '累計送信量',
     'streams.name': 'ストリーム名',
+    'streams.state': '状態',
+    'streams.active': 'アクティブ',
+    'streams.idle': '待機中',
     'streams.duration': '配信時間',
-    'streams.bitrate': '入力ビットレート',
+    'streams.inputRate': '入力ビットレート',
+    'streams.outputRate': '出力ビットレート',
+    'streams.received': '受信量',
+    'streams.sent': '送信量',
     'streams.clients': 'クライアント',
+    'streams.mediaDetails': 'メディア詳細',
+    'streams.video': 'ビデオ',
+    'streams.audio': 'オーディオ',
+    'streams.codec': 'コーデック',
+    'streams.resolution': '解像度',
+    'streams.frameRate': 'フレームレート',
+    'streams.sampleRate': 'サンプリングレート',
+    'streams.channels': 'チャンネル',
+    'streams.bitrate': 'ビットレート',
+    'streams.connectionDetails': '接続詳細',
+    'streams.showFullIps': '完全な IP を表示',
+    'streams.hideFullIps': 'IP をマスク',
+    'streams.connectionId': 'ID',
+    'streams.role': '種別',
+    'streams.address': 'クライアント IP',
+    'streams.connectionState': '接続状態',
+    'streams.dropped': 'ドロップ',
+    'streams.avSync': 'A/V 同期',
+    'streams.publishing': '入力配信',
+    'streams.playing': '再生 / 中継',
+    'streams.connected': '接続中',
+    'streams.inactive': '非アクティブ',
+    'streams.noConnections': '接続詳細はありません。',
     'footer.security': '信頼できるローカルネットワークでのみ使用してください',
     'footer.developedBy': '開発者',
     'footer.source': 'GitHub ソース',
@@ -207,12 +279,48 @@ const TRANSLATIONS = {
     'empty.title': '还没有推流目的地',
     'empty.description': '添加哔哩哔哩、斗鱼、虎牙或其他支持 RTMP 的直播平台。',
     'empty.add': '添加第一个平台',
-    'streams.eyebrow': '直播输入',
-    'streams.title': '当前直播流',
+    'streams.eyebrow': 'RTMP 统计',
+    'streams.title': 'RTMP 运行状态',
+    'streams.none': '当前没有活动的直播流。',
+    'streams.uptime': 'Nginx 运行时间',
+    'streams.accepted': '累计接受连接',
+    'streams.globalIn': '总输入码率',
+    'streams.globalOut': '总输出码率',
+    'streams.totalReceived': '累计接收',
+    'streams.totalSent': '累计发送',
     'streams.name': '串流名称',
+    'streams.state': '状态',
+    'streams.active': '活动',
+    'streams.idle': '空闲',
     'streams.duration': '持续时间',
-    'streams.bitrate': '输入码率',
+    'streams.inputRate': '输入码率',
+    'streams.outputRate': '输出码率',
+    'streams.received': '已接收',
+    'streams.sent': '已发送',
     'streams.clients': '客户端',
+    'streams.mediaDetails': '媒体详情',
+    'streams.video': '视频',
+    'streams.audio': '音频',
+    'streams.codec': '编码',
+    'streams.resolution': '分辨率',
+    'streams.frameRate': '帧率',
+    'streams.sampleRate': '采样率',
+    'streams.channels': '声道数',
+    'streams.bitrate': '码率',
+    'streams.connectionDetails': '连接详情',
+    'streams.showFullIps': '显示完整 IP',
+    'streams.hideFullIps': '隐藏完整 IP',
+    'streams.connectionId': 'ID',
+    'streams.role': '连接类型',
+    'streams.address': '客户端 IP',
+    'streams.connectionState': '连接状态',
+    'streams.dropped': '丢帧',
+    'streams.avSync': '音画同步',
+    'streams.publishing': '输入推流',
+    'streams.playing': '播放 / 转推',
+    'streams.connected': '已连接',
+    'streams.inactive': '未活动',
+    'streams.noConnections': '暂无连接详情。',
     'footer.security': '仅建议在可信局域网中使用',
     'footer.developedBy': '开发者',
     'footer.source': 'GitHub 源代码',
@@ -278,6 +386,7 @@ const state = {
   dialogInitial: null,
   locale: getInitialLocale(),
   saving: false,
+  revealClientIps: false,
 };
 
 const elements = {
@@ -458,11 +567,21 @@ async function handleCardAction(event) {
   }
 }
 
-function formatRate(bytesPerSecond) {
-  const bits = bytesPerSecond * 8;
+function formatRate(bitsPerSecond) {
+  const bits = Number(bitsPerSecond) || 0;
+  if (bits >= 1_000_000_000) return `${(bits / 1_000_000_000).toFixed(2)} Gbps`;
   if (bits >= 1_000_000) return `${(bits / 1_000_000).toFixed(2)} Mbps`;
   if (bits >= 1_000) return `${(bits / 1_000).toFixed(0)} Kbps`;
   return `${bits} bps`;
+}
+
+function formatBytes(value) {
+  const bytes = Number(value) || 0;
+  const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB'];
+  if (bytes <= 0) return '0 B';
+  const unit = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  const amount = bytes / (1024 ** unit);
+  return `${amount.toFixed(unit === 0 ? 0 : amount >= 100 ? 0 : amount >= 10 ? 1 : 2)} ${units[unit]}`;
 }
 
 function formatDuration(milliseconds) {
@@ -473,9 +592,132 @@ function formatDuration(milliseconds) {
   return [hours, minutes, seconds].map((value) => String(value).padStart(2, '0')).join(':');
 }
 
+function formatRuntimeDuration(seconds) {
+  const days = Math.floor((Number(seconds) || 0) / 86400);
+  const remainder = (Number(seconds) || 0) % 86400;
+  const duration = formatDuration(remainder * 1000);
+  return days ? `${days}d ${duration}` : duration;
+}
+
+function formatOptional(value, formatter = (item) => item) {
+  return value === null || value === undefined || value === '' ? '—' : formatter(value);
+}
+
+function formatCodec(media) {
+  return [media?.codec, media?.profile, media?.level].filter(Boolean).join(' ') || '—';
+}
+
+function formatResolution(video) {
+  return video?.width && video?.height ? `${video.width} × ${video.height}` : '—';
+}
+
+function maskIp(address) {
+  if (!address) return '—';
+  if (address.includes('.')) return address.replace(/(\d+)(?!.*\d)/, '***');
+  if (address.includes(':')) {
+    const visible = address.split(':').filter(Boolean).slice(0, 3);
+    return `${visible.join(':') || '::'}:${visible.length ? '' : ':'}****`;
+  }
+  return address;
+}
+
+function captureOpenStreamDetails() {
+  return new Set([...document.querySelectorAll('#stream-list details[open]')]
+    .map((detail) => `${detail.closest('[data-stream-index]')?.dataset.streamIndex}:${detail.dataset.detail}`));
+}
+
+function restoreOpenStreamDetails(openDetails) {
+  document.querySelectorAll('#stream-list details').forEach((detail) => {
+    const key = `${detail.closest('[data-stream-index]')?.dataset.streamIndex}:${detail.dataset.detail}`;
+    detail.open = openDetails.has(key);
+  });
+}
+
+function renderRuntime(runtime = {}) {
+  document.querySelector('#runtime-versions').textContent = [
+    runtime.nginxVersion ? `Nginx ${runtime.nginxVersion}` : null,
+    runtime.rtmpVersion ? `nginx-rtmp ${runtime.rtmpVersion}` : null,
+  ].filter(Boolean).join(' · ');
+  document.querySelector('#rtmp-summary').innerHTML = `
+    <div class="runtime-value"><span>${escapeHtml(t('streams.uptime'))}</span><strong>${formatRuntimeDuration(runtime.uptimeSeconds)}</strong></div>
+    <div class="runtime-value"><span>${escapeHtml(t('streams.accepted'))}</span><strong>${runtime.acceptedConnections || 0}</strong></div>
+    <div class="runtime-value"><span>${escapeHtml(t('streams.globalIn'))}</span><strong>${formatRate(runtime.bandwidthIn)}</strong></div>
+    <div class="runtime-value"><span>${escapeHtml(t('streams.globalOut'))}</span><strong>${formatRate(runtime.bandwidthOut)}</strong></div>
+    <div class="runtime-value"><span>${escapeHtml(t('streams.totalReceived'))}</span><strong>${formatBytes(runtime.bytesIn)}</strong></div>
+    <div class="runtime-value"><span>${escapeHtml(t('streams.totalSent'))}</span><strong>${formatBytes(runtime.bytesOut)}</strong></div>
+  `;
+}
+
+function renderMediaDetails(stream) {
+  const video = stream.video || {};
+  const audio = stream.audio || {};
+  return `
+    <details class="stream-details" data-detail="media">
+      <summary>${escapeHtml(t('streams.mediaDetails'))}</summary>
+      <div class="media-grid">
+        <section class="media-card">
+          <h4>${escapeHtml(t('streams.video'))}</h4>
+          <dl>
+            <div><dt>${escapeHtml(t('streams.codec'))}</dt><dd>${escapeHtml(formatCodec(video))}</dd></div>
+            <div><dt>${escapeHtml(t('streams.resolution'))}</dt><dd>${escapeHtml(formatResolution(video))}</dd></div>
+            <div><dt>${escapeHtml(t('streams.frameRate'))}</dt><dd>${escapeHtml(formatOptional(video.frameRate, (value) => `${value} fps`))}</dd></div>
+            <div><dt>${escapeHtml(t('streams.bitrate'))}</dt><dd>${escapeHtml(formatOptional(video.bitrate, formatRate))}</dd></div>
+          </dl>
+        </section>
+        <section class="media-card">
+          <h4>${escapeHtml(t('streams.audio'))}</h4>
+          <dl>
+            <div><dt>${escapeHtml(t('streams.codec'))}</dt><dd>${escapeHtml(formatCodec(audio))}</dd></div>
+            <div><dt>${escapeHtml(t('streams.sampleRate'))}</dt><dd>${escapeHtml(formatOptional(audio.sampleRate, (value) => `${(value / 1000).toFixed(value % 1000 ? 1 : 0)} kHz`))}</dd></div>
+            <div><dt>${escapeHtml(t('streams.channels'))}</dt><dd>${escapeHtml(formatOptional(audio.channels))}</dd></div>
+            <div><dt>${escapeHtml(t('streams.bitrate'))}</dt><dd>${escapeHtml(formatOptional(audio.bitrate, formatRate))}</dd></div>
+          </dl>
+        </section>
+      </div>
+    </details>
+  `;
+}
+
+function renderConnectionDetails(stream) {
+  const connections = stream.connections || [];
+  const rows = connections.map((connection) => `
+    <tr>
+      <td data-label="${escapeHtml(t('streams.connectionId'))}">${escapeHtml(connection.id)}</td>
+      <td data-label="${escapeHtml(t('streams.role'))}">${escapeHtml(t(`streams.${connection.role}`))}</td>
+      <td data-label="${escapeHtml(t('streams.address'))}" class="client-address">${escapeHtml(state.revealClientIps ? connection.address || '—' : maskIp(connection.address))}</td>
+      <td data-label="${escapeHtml(t('streams.connectionState'))}"><span class="connection-state${connection.active ? ' active' : ''}">${escapeHtml(t(connection.active ? 'streams.connected' : 'streams.inactive'))}</span></td>
+      <td data-label="${escapeHtml(t('streams.duration'))}">${formatDuration(connection.timeMs)}</td>
+      <td data-label="${escapeHtml(t('streams.dropped'))}">${connection.dropped || 0}</td>
+      <td data-label="${escapeHtml(t('streams.avSync'))}">${escapeHtml(formatOptional(connection.avSyncMs, (value) => `${value} ms`))}</td>
+    </tr>
+  `).join('');
+  return `
+    <details class="stream-details" data-detail="connections">
+      <summary>${escapeHtml(t('streams.connectionDetails'))} <span>${connections.length}</span></summary>
+      <div class="connection-toolbar">
+        <button class="secondary-button ip-toggle" type="button" data-action="toggle-ips" aria-pressed="${state.revealClientIps}">
+          ${escapeHtml(t(state.revealClientIps ? 'streams.hideFullIps' : 'streams.showFullIps'))}
+        </button>
+      </div>
+      ${connections.length ? `
+        <div class="connection-table-wrap">
+          <table class="connection-table">
+            <thead><tr>
+              <th>${escapeHtml(t('streams.connectionId'))}</th><th>${escapeHtml(t('streams.role'))}</th>
+              <th>${escapeHtml(t('streams.address'))}</th><th>${escapeHtml(t('streams.connectionState'))}</th>
+              <th>${escapeHtml(t('streams.duration'))}</th><th>${escapeHtml(t('streams.dropped'))}</th><th>${escapeHtml(t('streams.avSync'))}</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>` : `<p class="detail-empty">${escapeHtml(t('streams.noConnections'))}</p>`}
+    </details>
+  `;
+}
+
 function renderStatus(status) {
   const online = status.nginx === 'online';
   const streams = status.activeStreams || [];
+  const openDetails = captureOpenStreamDetails();
   document.querySelector('#connection-pill').className = `connection ${online ? 'online' : 'offline'}`;
   document.querySelector('#connection-text').textContent = t(online ? 'connection.online' : 'connection.nginxOffline');
   document.querySelector('#gateway-status').textContent = t(online ? 'metrics.online' : 'metrics.offline');
@@ -485,15 +727,27 @@ function renderStatus(status) {
   document.querySelector('#destination-count').textContent = status.enabledDestinations || 0;
   document.querySelector('#live-badge').textContent = t(streams.length ? 'ingest.live' : 'ingest.waiting');
   document.querySelector('#live-badge').className = `live-badge${streams.length ? ' live' : ''}`;
-  document.querySelector('#stream-panel').hidden = streams.length === 0;
-  document.querySelector('#stream-list').innerHTML = streams.map((stream) => `
-    <article class="stream-row">
-      <div class="stream-value"><span>${escapeHtml(t('streams.name'))}</span><strong>${escapeHtml(stream.name)}</strong></div>
-      <div class="stream-value"><span>${escapeHtml(t('streams.duration'))}</span><strong>${formatDuration(stream.timeMs)}</strong></div>
-      <div class="stream-value"><span>${escapeHtml(t('streams.bitrate'))}</span><strong>${formatRate(stream.bandwidthIn)}</strong></div>
-      <div class="stream-value"><span>${escapeHtml(t('streams.clients'))}</span><strong>${stream.clients}</strong></div>
+  document.querySelector('#stream-panel').hidden = !online;
+  renderRuntime(status.runtime);
+  document.querySelector('#stream-list').innerHTML = streams.length ? streams.map((stream, index) => `
+    <article class="stream-card" data-stream-index="${index}">
+      <header class="stream-card-head">
+        <div><span>${escapeHtml(t('streams.name'))}</span><strong>${escapeHtml(stream.name)}</strong></div>
+        <span class="stream-state${stream.active ? ' active' : ''}">${escapeHtml(t(stream.active ? 'streams.active' : 'streams.idle'))}</span>
+      </header>
+      <div class="stream-overview">
+        <div class="stream-value"><span>${escapeHtml(t('streams.duration'))}</span><strong>${formatDuration(stream.timeMs)}</strong></div>
+        <div class="stream-value"><span>${escapeHtml(t('streams.inputRate'))}</span><strong>${formatRate(stream.bandwidthIn)}</strong></div>
+        <div class="stream-value"><span>${escapeHtml(t('streams.outputRate'))}</span><strong>${formatRate(stream.bandwidthOut)}</strong></div>
+        <div class="stream-value"><span>${escapeHtml(t('streams.received'))}</span><strong>${formatBytes(stream.bytesIn)}</strong></div>
+        <div class="stream-value"><span>${escapeHtml(t('streams.sent'))}</span><strong>${formatBytes(stream.bytesOut)}</strong></div>
+        <div class="stream-value"><span>${escapeHtml(t('streams.clients'))}</span><strong>${stream.clients || 0}</strong></div>
+      </div>
+      ${renderMediaDetails(stream)}
+      ${renderConnectionDetails(stream)}
     </article>
-  `).join('');
+  `).join('') : `<div class="stream-empty">${escapeHtml(t('streams.none'))}</div>`;
+  restoreOpenStreamDetails(openDetails);
 }
 
 function renderPendingStatus() {
@@ -552,6 +806,12 @@ document.querySelector('#add-destination').addEventListener('click', () => openD
 document.querySelector('#empty-add').addEventListener('click', () => openDialog());
 elements.form.addEventListener('submit', handleFormSubmit);
 elements.list.addEventListener('click', handleCardAction);
+document.querySelector('#stream-list').addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-action="toggle-ips"]');
+  if (!button) return;
+  state.revealClientIps = !state.revealClientIps;
+  if (state.status) renderStatus(state.status);
+});
 elements.cancel.addEventListener('click', requestDialogClose);
 elements.close.addEventListener('click', requestDialogClose);
 elements.dialog.addEventListener('cancel', (event) => {

@@ -115,6 +115,10 @@ docker pull raykimurayyz/nginx-rtmp:v0.1.2
 
 The image builds verified upstream releases of NGINX and nginx-rtmp-module. Their source code is not vendored or modified by this project.
 
+## License
+
+The original RTMP Relay Manager code is licensed under the MIT License. NGINX and nginx-rtmp-module remain subject to their respective 2-clause BSD licenses. Complete license texts and third-party notices are included in the image and the GitHub repository.
+
 Full documentation, source code, license notices, issue tracking, and release workflow are available on GitHub:
 
 **[github.com/raykimurayyz/nginx-rtmp](https://github.com/raykimurayyz/nginx-rtmp)**

@@ -168,6 +168,8 @@ Dockerfile             Reproducible upstream build and runtime image
 docker-compose.yml     Local deployment
 ```
 
-## License status
+## License
 
-No license has yet been assigned to the original code in this repository. NGINX and nginx-rtmp-module remain subject to their respective 2-clause BSD licenses. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The original code in this repository is licensed under the [MIT License](LICENSE).
+
+NGINX and nginx-rtmp-module are third-party components and remain subject to their respective 2-clause BSD licenses. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

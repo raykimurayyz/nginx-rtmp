@@ -1,23 +1,23 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="局域网 RTMP 多平台转推管理面板" data-i18n-content="meta.description">
+    <meta name="description" content="A local dashboard for relaying one RTMP stream to multiple platforms." data-i18n-content="meta.description">
     <title>RTMP Relay Manager</title>
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body>
     <div class="page-shell">
       <header class="topbar">
-        <a class="brand" href="/" aria-label="RTMP Relay Manager 首页" data-i18n-aria-label="brand.homeAria">
+        <a class="brand" href="/" aria-label="RTMP Relay Manager home" data-i18n-aria-label="brand.homeAria">
           <span class="brand-mark"><span></span></span>
           <span>RTMP <b>RELAY</b></span>
         </a>
         <div class="topbar-actions">
           <label class="language-picker">
-            <span class="sr-only" data-i18n="language.label">语言</span>
-            <select id="language-select" aria-label="语言" data-i18n-aria-label="language.label">
+            <span class="sr-only" data-i18n="language.label">Language</span>
+            <select id="language-select" aria-label="Language" data-i18n-aria-label="language.label">
               <option value="en">English</option>
               <option value="ja">日本語</option>
               <option value="zh-CN">中文</option>
@@ -25,7 +25,7 @@
           </label>
           <div class="connection" id="connection-pill">
             <span class="status-dot"></span>
-            <span id="connection-text">正在连接</span>
+            <span id="connection-text">Connecting</span>
           </div>
         </div>
       </header>
@@ -34,37 +34,37 @@
         <section class="hero">
           <div class="hero-copy">
             <p class="eyebrow" data-i18n="hero.eyebrow">PRIVATE STREAM GATEWAY</p>
-            <h1><span data-i18n="hero.titlePrimary">一条直播流，</span><br><em data-i18n="hero.titleAccent">转推到多个平台。</em></h1>
-            <p class="hero-description" data-i18n="hero.description">将 PS5、OBS 或其他设备推送到这里，再由 Nginx RTMP 安全转发到已启用的直播平台。</p>
+            <h1><span data-i18n="hero.titlePrimary">One live stream,</span><br><em data-i18n="hero.titleAccent">relayed everywhere.</em></h1>
+            <p class="hero-description" data-i18n="hero.description">Send your PS5, OBS, or another device here, then let Nginx RTMP securely relay it to every enabled platform.</p>
           </div>
           <div class="ingest-card">
             <div class="ingest-card-head">
-              <span data-i18n="ingest.title">本机推流地址</span>
-              <span class="live-badge" id="live-badge">等待直播流</span>
+              <span data-i18n="ingest.title">Local ingest URL</span>
+              <span class="live-badge" id="live-badge">Waiting for stream</span>
             </div>
             <div class="url-box">
               <code id="ingest-url">rtmp://localhost:1935/live</code>
-              <button class="icon-button" id="copy-url" type="button" aria-label="复制推流地址" title="复制" data-i18n="ingest.copy" data-i18n-aria-label="ingest.copyAria" data-i18n-title="ingest.copy">复制</button>
+              <button class="icon-button" id="copy-url" type="button" aria-label="Copy ingest URL" title="Copy" data-i18n="ingest.copy" data-i18n-aria-label="ingest.copyAria" data-i18n-title="ingest.copy">Copy</button>
             </div>
-            <p data-i18n="ingest.description">在推流软件中填写此服务器地址，串流名称可以自定义。</p>
+            <p data-i18n="ingest.description">Use this server URL in your streaming software. The stream name can be customized.</p>
           </div>
         </section>
 
-        <section class="metrics" aria-label="运行状态" data-i18n-aria-label="metrics.ariaLabel">
+        <section class="metrics" aria-label="Runtime status" data-i18n-aria-label="metrics.ariaLabel">
           <article class="metric">
-            <span class="metric-label" data-i18n="metrics.gateway">网关状态</span>
-            <strong id="gateway-status">检查中</strong>
-            <small id="gateway-detail">正在读取 Nginx 状态</small>
+            <span class="metric-label" data-i18n="metrics.gateway">Gateway status</span>
+            <strong id="gateway-status">Checking</strong>
+            <small id="gateway-detail">Reading Nginx status</small>
           </article>
           <article class="metric">
-            <span class="metric-label" data-i18n="metrics.input">输入直播流</span>
+            <span class="metric-label" data-i18n="metrics.input">Input streams</span>
             <strong id="stream-count">0</strong>
-            <small id="stream-detail">暂未收到直播</small>
+            <small id="stream-detail">No live stream received</small>
           </article>
           <article class="metric">
-            <span class="metric-label" data-i18n="metrics.destinations">启用的目的地</span>
+            <span class="metric-label" data-i18n="metrics.destinations">Enabled destinations</span>
             <strong id="destination-count">0</strong>
-            <small data-i18n="metrics.destinationsDetail">支持同时转推</small>
+            <small data-i18n="metrics.destinationsDetail">Concurrent relay supported</small>
           </article>
         </section>
 
@@ -72,18 +72,18 @@
           <div class="section-heading">
             <div>
               <p class="eyebrow" data-i18n="workspace.eyebrow">DESTINATIONS</p>
-              <h2 data-i18n="workspace.title">推流目的地</h2>
-              <p data-i18n="workspace.description">填写平台提供的 RTMP 服务器地址和串流密钥。</p>
+              <h2 data-i18n="workspace.title">Relay destinations</h2>
+              <p data-i18n="workspace.description">Enter the RTMP server URL and stream key supplied by each platform.</p>
             </div>
-            <button class="primary-button" id="add-destination" type="button"><span>＋</span> <span data-i18n="workspace.add">添加平台</span></button>
+            <button class="primary-button" id="add-destination" type="button"><span>＋</span> <span data-i18n="workspace.add">Add platform</span></button>
           </div>
 
           <div class="destination-list" id="destination-list"></div>
           <div class="empty-state" id="empty-state">
             <div class="empty-icon">↗</div>
-            <h3 data-i18n="empty.title">还没有推流目的地</h3>
-            <p data-i18n="empty.description">添加哔哩哔哩、斗鱼、虎牙或其他支持 RTMP 的直播平台。</p>
-            <button class="secondary-button" id="empty-add" type="button" data-i18n="empty.add">添加第一个平台</button>
+            <h3 data-i18n="empty.title">No relay destinations yet</h3>
+            <p data-i18n="empty.description">Add YouTube, Twitch, or any other platform that supports RTMP.</p>
+            <button class="secondary-button" id="empty-add" type="button" data-i18n="empty.add">Add the first platform</button>
           </div>
         </section>
 
@@ -91,7 +91,7 @@
           <div class="section-heading compact">
             <div>
               <p class="eyebrow" data-i18n="streams.eyebrow">RTMP STATISTICS</p>
-              <h2 data-i18n="streams.title">RTMP 运行状态</h2>
+              <h2 data-i18n="streams.title">RTMP runtime status</h2>
             </div>
             <p class="runtime-versions" id="runtime-versions"></p>
           </div>
@@ -103,12 +103,12 @@
       <footer>
         <div class="footer-summary">
           <strong>RTMP Relay Manager</strong>
-          <span data-i18n="footer.security">仅建议在可信局域网中使用</span>
+          <span data-i18n="footer.security">Recommended for trusted local networks only</span>
         </div>
         <div class="footer-links">
-          <span><span data-i18n="footer.developedBy">开发者</span> <a href="https://github.com/raykimurayyz" target="_blank" rel="noopener noreferrer">raykimurayyz</a></span>
-          <a href="https://github.com/raykimurayyz/nginx-rtmp" target="_blank" rel="noopener noreferrer" data-i18n="footer.source">GitHub 源代码</a>
-          <a href="https://hub.docker.com/r/raykimurayyz/nginx-rtmp" target="_blank" rel="noopener noreferrer" data-i18n="footer.image">Docker Hub 镜像</a>
+          <span><span data-i18n="footer.developedBy">Developed by</span> <a href="https://github.com/raykimurayyz" target="_blank" rel="noopener noreferrer">raykimurayyz</a></span>
+          <a href="https://github.com/raykimurayyz/nginx-rtmp" target="_blank" rel="noopener noreferrer" data-i18n="footer.source">GitHub source</a>
+          <a href="https://hub.docker.com/r/raykimurayyz/nginx-rtmp" target="_blank" rel="noopener noreferrer" data-i18n="footer.image">Docker Hub image</a>
         </div>
       </footer>
     </div>
@@ -118,38 +118,38 @@
         <div class="dialog-head">
           <div>
             <p class="eyebrow" data-i18n="dialog.eyebrow">DESTINATION</p>
-            <h2 id="dialog-title">添加推流平台</h2>
+            <h2 id="dialog-title">Add relay platform</h2>
           </div>
-          <button class="close-button" id="close-dialog" aria-label="关闭" type="button" data-i18n-aria-label="dialog.close">×</button>
+          <button class="close-button" id="close-dialog" aria-label="Close" type="button" data-i18n-aria-label="dialog.close">×</button>
         </div>
         <input type="hidden" id="destination-id">
         <label>
-          <span data-i18n="dialog.name">平台名称</span>
-          <input id="destination-name" maxlength="60" placeholder="例如：哔哩哔哩" required autocomplete="off" data-i18n-placeholder="dialog.namePlaceholder">
+          <span data-i18n="dialog.name">Platform name</span>
+          <input id="destination-name" maxlength="60" placeholder="For example: YouTube" required autocomplete="off" data-i18n-placeholder="dialog.namePlaceholder">
         </label>
         <label>
-          <span data-i18n="dialog.server">RTMP 服务器地址</span>
+          <span data-i18n="dialog.server">RTMP server URL</span>
           <input id="server-url" type="url" maxlength="1024" placeholder="rtmp://live-push.example.com/live" required spellcheck="false" autocomplete="off">
-          <small data-i18n="dialog.serverHelp">填写平台提供的服务器地址，目前支持 RTMP。</small>
+          <small data-i18n="dialog.serverHelp">Enter the server URL supplied by the platform. RTMP is currently supported.</small>
         </label>
         <label>
-          <span data-i18n="dialog.key">串流密钥</span>
+          <span data-i18n="dialog.key">Stream key</span>
           <div class="secret-input">
-            <input id="stream-key" type="password" maxlength="1024" placeholder="填写平台提供的串流密钥" spellcheck="false" autocomplete="new-password" data-i18n-placeholder="dialog.keyPlaceholder">
-            <button type="button" id="toggle-key">显示</button>
+            <input id="stream-key" type="password" maxlength="1024" placeholder="Enter the stream key supplied by the platform" spellcheck="false" autocomplete="new-password" data-i18n-placeholder="dialog.keyPlaceholder">
+            <button type="button" id="toggle-key">Show</button>
           </div>
-          <small id="key-help">密钥只保存在本机 Docker 数据卷中。</small>
+          <small id="key-help">The key is stored only in the local Docker volume.</small>
         </label>
         <label class="switch-row">
           <span>
-            <b data-i18n="dialog.enabled">立即启用</b>
-            <small data-i18n="dialog.enabledHelp">收到直播流后自动向该平台转推</small>
+            <b data-i18n="dialog.enabled">Enable now</b>
+            <small data-i18n="dialog.enabledHelp">Relay to this platform automatically when a stream arrives</small>
           </span>
           <input id="destination-enabled" type="checkbox" checked>
         </label>
         <div class="dialog-actions">
-          <button class="secondary-button" id="cancel-destination" type="button" data-i18n="dialog.cancel">取消</button>
-          <button class="primary-button" id="save-destination" type="submit" data-i18n="dialog.save">保存并应用</button>
+          <button class="secondary-button" id="cancel-destination" type="button" data-i18n="dialog.cancel">Cancel</button>
+          <button class="primary-button" id="save-destination" type="submit" data-i18n="dialog.save">Save and apply</button>
         </div>
       </form>
     </dialog>

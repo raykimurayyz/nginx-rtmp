@@ -13,6 +13,7 @@ A lightweight, Dockerized NGINX RTMP relay with a simple web interface for multi
 - Validate configuration before applying changes and restore the previous configuration on failure.
 - Monitor NGINX health, aggregate and per-stream traffic, transfer totals, media metadata, and RTMP connections.
 - Keep client IP addresses masked by default and reveal them temporarily when troubleshooting.
+- Detect English, Japanese, or Simplified Chinese from the browser on first use, fall back to English, and save both detected and manually selected preferences per browser.
 - Run as a non-root user on both AMD64 and ARM64 systems.
 
 ## Quick start

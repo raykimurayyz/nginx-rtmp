@@ -1,157 +1,211 @@
 # RTMP Relay Manager
 
-[English README](README.md) · [Docker Hub：raykimurayyz/nginx-rtmp](https://hub.docker.com/r/raykimurayyz/nginx-rtmp)
+[![CI](https://github.com/raykimurayyz/nginx-rtmp/actions/workflows/ci.yml/badge.svg)](https://github.com/raykimurayyz/nginx-rtmp/actions/workflows/ci.yml)
+[![Docker Pulls](https://img.shields.io/docker/pulls/raykimurayyz/nginx-rtmp)](https://hub.docker.com/r/raykimurayyz/nginx-rtmp)
+[![Docker Image Version](https://img.shields.io/docker/v/raykimurayyz/nginx-rtmp?sort=semver)](https://hub.docker.com/r/raykimurayyz/nginx-rtmp/tags)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-这是一个适合自行部署的轻量直播转推管理工具。它接收一路 RTMP 直播流，通过网页配置将直播同时转推到一个或多个国内外直播平台。项目面向可信局域网使用，把 NGINX、nginx-rtmp-module 和无第三方依赖的管理服务打包在一个 Docker 镜像中。
+[English README](README.md) · [Docker Hub](https://hub.docker.com/r/raykimurayyz/nginx-rtmp)
 
-本项目**不提交、不修改** NGINX 或 nginx-rtmp-module 源码。只有在构建 Docker 镜像时，才会下载并校验上游正式版本源码包。
+一个可自行部署的 RTMP 多平台直播转推工具。它可以接收来自 OBS、PlayStation 4/5 或 Xbox 等游戏主机推流方案、摄像机、硬件编码器以及其他支持 RTMP 的视频源，再通过网页将一路直播流同时转发到多个直播平台。
 
-## 功能
+![RTMP Relay Manager 管理界面](docs/images/dashboard-zh-CN.png)
 
-- 接收 OBS、PS5 相关方案、摄像机或其他设备的 RTMP 推流。
-- 通过网页添加、编辑、启用、停用和删除推流目的地。
-- 将一路输入直播流同时转推到多个 RTMP 平台。
-- 串流密钥保存后不再通过 API 返回给浏览器。
-- 应用配置前执行 `nginx -t` 检查。
-- 检查或重载失败时自动恢复原配置。
-- 显示 NGINX 状态、整体及单流输入/输出码率、累计流量、媒体参数和 RTMP 连接详情。
-- 客户端 IP 默认脱敏，可在页面中临时切换为完整地址。
-- 支持英文、日文和简体中文，首次使用时识别浏览器语言，自动识别和手动选择的结果都会保存在当前浏览器中。
-- 容器使用非 root 用户运行，Compose 会移除全部 Linux capabilities。
-- GitHub Actions 自动构建 `linux/amd64` 和 `linux/arm64` 镜像。
+## 为什么使用它？
 
-## 上游组件版本
+- **只推一路，同时转发到多个平台。** 输入端无需分别连接每个直播平台。
+- **不需要手动编辑 NGINX。** 在网页中添加、编辑、启用、停用或删除转推目的地。
+- **随时查看直播状态。** 监控输入/输出码率、累计流量、媒体参数、活动流和 RTMP 连接。
+- **升级镜像不丢配置。** 目的地和串流密钥保存在 Docker 管理的数据卷中，不在可随时替换的容器内。
+- **支持多语言。** 首次打开时自动识别英文、日文或简体中文。
+- **完全自托管。** 不需要云端账号或外部控制服务。
 
-| 组件 | 版本 | 来源 |
-| --- | --- | --- |
-| Alpine Linux | 3.24 | Alpine 官方镜像 |
-| NGINX | 1.30.3 stable | `nginx.org` 官方发布包 |
-| nginx-rtmp-module | 1.2.2 | 上游正式标签对应的固定提交 |
+## 工作方式
 
-Dockerfile 固定了下载文件的 SHA-256 和 RTMP 模块的准确提交。许可证信息参见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+```text
+OBS / PlayStation 或 Xbox 主机方案 / 摄像机 / RTMP 编码器
+                              |
+                              | 一路 RTMP 直播流
+                              v
+                    RTMP Relay Manager
+                     /        |        \
+                    v         v         v
+                 平台 A    平台 B    平台 C
+```
+
+应用使用 NGINX 和 nginx-rtmp-module 传输直播流，并通过轻量管理服务提供网页、参数检查、配置重载和运行状态。
+
+游戏主机通常需要通过兼容的采集卡、直播软件或硬件编码器接入。能否原生填写自定义 RTMP 地址，取决于具体主机和所使用的软件。
 
 ## 快速启动
 
-需要准备：
+需要 Docker Engine 24 或更高版本，或者安装了 Docker Compose v2 的 Docker Desktop。
 
-- Docker Engine 24 或更高版本，或者 Docker Desktop
-- Docker Compose v2
+### Docker Compose（推荐）
 
-启动服务：
+创建 `compose.yaml`：
+
+```yaml
+services:
+  nginx-rtmp:
+    image: raykimurayyz/nginx-rtmp:latest
+    container_name: nginx-rtmp
+    restart: unless-stopped
+    ports:
+      - "1935:1935"
+      - "8080:8080"
+    volumes:
+      - nginx-rtmp-data:/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  nginx-rtmp-data:
+```
+
+启动容器：
 
 ```bash
-docker compose up -d --build
+docker compose up -d
+```
+
+### Docker 命令行
+
+```bash
+docker volume create nginx-rtmp-data
+
+docker run -d \
+  --name nginx-rtmp \
+  --restart unless-stopped \
+  --security-opt no-new-privileges:true \
+  --cap-drop ALL \
+  -p 1935:1935 \
+  -p 8080:8080 \
+  -v nginx-rtmp-data:/data \
+  raykimurayyz/nginx-rtmp:latest
 ```
 
 打开管理页面：
 
 ```text
-http://localhost:8080
+http://你的Docker主机IP:8080
 ```
 
-在 OBS 或其他推流软件中填写：
+## 开始直播
 
-- 服务器：`rtmp://你的Docker主机IP:1935/live`
-- 串流密钥：任意本地串流名称，例如 `main`
+### 1. 添加直播平台
 
-然后在管理页面中添加直播平台提供的 RTMP 服务器地址和串流密钥。
+打开管理页面，点击 **添加平台**，填写直播平台提供的两个参数：
 
-停止服务：
+- **RTMP 服务器地址**，例如 `rtmp://live-push.example.com/live`
+- **串流密钥**，例如 `abc123-secret`
+
+启用并保存该目的地。每个需要接收直播的平台都可以单独添加。
+
+![添加转推目的地](docs/images/destination-dialog-zh-CN.png)
+
+### 2. 配置 OBS 或其他推流端
+
+填写以下输入参数：
+
+```text
+服务器：  rtmp://你的Docker主机IP:1935/live
+串流密钥：main
+```
+
+本地串流密钥可以是任意自定义流名称。它和网页中填写的各直播平台串流密钥不是同一个参数。
+
+### 3. 开始推流
+
+从 OBS 或其他推流端开始直播后，RTMP Relay Manager 会自动把输入流转发到所有已启用的目的地。管理页面每 5 秒刷新一次流量和连接信息。
+
+如果在输入流已连接时修改了转推目的地，请重新连接一次推流端，以确保新配置生效。
+
+## 管理界面
+
+管理页面可以显示：
+
+- NGINX 和 RTMP 服务状态
+- 当前活动的输入流及持续时间
+- 整体和单路流的输入/输出码率
+- 累计接收和发送流量
+- 视频编码、Profile、Level、分辨率和帧率
+- 音频编码、Profile、采样率、声道数和码率
+- RTMP 连接类型、状态、时长、丢帧和音画同步
+- 默认脱敏的客户端 IP，以及临时显示完整 IP 的按钮
+- 英文、日文和简体中文自动识别与切换
+
+选中的界面语言保存在当前浏览器中。“显示完整 IP”不会被记住，刷新页面后会恢复脱敏。
+
+## 配置持久化与升级
+
+目的地和串流密钥保存在 `/data/config.json`。上面的示例使用 Docker 管理的 `nginx-rtmp-data` 数据卷挂载 `/data`，所以替换或升级容器不会删除已保存配置。
+
+升级 Compose 部署：
 
 ```bash
-docker compose down
+docker compose pull
+docker compose up -d
 ```
 
-配置保存在名为 `relay-data` 的 Docker 数据卷中，执行 `docker compose down` 不会删除配置。如果确定需要删除所有已保存配置：
+除非确定要删除已保存的配置，否则不要执行 `docker compose down -v`。
 
-```bash
-docker compose down -v
-```
+NGINX 连接目的地时必须使用串流密钥，因此密钥会以明文保存在 Docker 数据卷中。请保护 Docker 主机及其数据卷。
 
 ## 端口
 
 | 端口 | 用途 |
 | --- | --- |
-| `1935/tcp` | 接收 OBS、PS5 方案或其他设备的 RTMP 推流 |
+| `1935/tcp` | 接收 OBS、游戏主机推流方案、摄像机、编码器或其他支持 RTMP 的视频源 |
 | `8080/tcp` | 网页管理界面和 API |
 
-NGINX 状态接口只监听容器内部回环地址，不对宿主机开放。
+NGINX 原始状态接口只监听容器内部回环地址，不会发布到宿主机。
 
-## 平台配置格式
+## 镜像标签和平台
 
-在页面中填写直播平台通常提供的两个值：
+支持的平台：
 
-- **RTMP 服务器地址**，例如 `rtmp://live-push.example.com/live`
-- **串流密钥**，例如 `abc123-secret`
+- `linux/amd64`
+- `linux/arm64`
 
-管理服务会把服务器地址作为远程应用地址，把串流密钥作为 `playPath`，生成受控的 nginx-rtmp `push` 配置。所有字段都会经过结构检查、控制字符检查、引用和转义。
+发布的镜像标签：
 
-当前版本只支持普通 RTMP 目的地。RTMPS、SRT、平台特有签名以及转码功能需要后续增加基于 FFmpeg 的转推模式。
+- `latest` — 最近发布的稳定版本
+- `vX.Y.Z` — 不可变的应用版本，例如 `v0.2.0`
 
-## 直播过程中修改配置
+如果需要可复现部署，建议使用完整版本标签，不要使用 `latest`。
 
-NGINX 会进行平滑重载，但已经连接的推流端可能继续由旧工作进程处理。如果在直播过程中修改了推流目的地，请断开并重新连接一次 OBS 或 PS5 输入流，确保新配置生效。页面保存时也会显示此提示。
+## 安全模型与限制
 
-## 局域网安全模型
+本项目按照设计不提供登录页面，仅适合在可信局域网中使用。不要将 `8080` 端口直接暴露到公网。
 
-项目按照需求不提供登录页面，仅建议部署在可信局域网中，不要直接暴露到公网。
+已提供的保护：
 
-即使不做登录，项目仍然提供以下保护：
+- 容器使用非 root 用户运行
+- 示例配置启用 `no-new-privileges` 并移除 Linux capabilities
+- 检查平台名称、RTMP 地址、串流密钥、ID 和请求大小
+- 重载前执行 `nginx -t`，失败时恢复原配置
+- 串流密钥默认脱敏，保存后不会再通过配置 API 返回完整密钥
+- 管理界面响应包含 HTTP 安全头
+- NGINX 原始统计接口只在容器内部开放
 
-- 不提供任意 NGINX 配置编辑器或执行系统命令的接口。
-- 检查平台名称、RTMP 地址、串流密钥、ID 和请求大小。
-- 原子写入配置，依次执行检查、重载和失败回滚。
-- 串流密钥会打码，并且配置 API 不返回完整密钥。
-- 管理页面响应包含基本 HTTP 安全头。
-- 容器使用非 root 用户、`no-new-privileges` 并移除 capabilities。
+当前限制：
 
-由于 NGINX 建立平台连接时必须使用串流密钥，密钥会以明文保存在 Docker 数据卷内的 `/data/config.json`。需要保护 Docker 主机及其数据卷访问权限。
+- 转推目的地必须使用普通 `rtmp://` 地址。
+- 暂不包含 RTMPS、SRT、转码和平台特有签名。
+- RTMP 连接存在不代表目的地平台已通过审核或已公开开播。
 
-## GitHub Actions 流水线
+## 从源码构建
 
-项目包含两条流水线：
-
-- **CI**：提交到 `main` 或创建 Pull Request 时运行 Python 单元测试；Docker 镜像验证构建只在 Pull Request 中运行。
-- **Publish to Docker Hub**：只有推送严格的 `vX.Y.Z` 标签（例如 `v1.0.0`）或手动触发时，才构建并发布 AMD64、ARM64 镜像到 Docker Hub。合并到 `main` 不再发布镜像。
-
-运行发布流水线前，需要在 GitHub Actions 仓库 Secrets 中添加：
-
-- `DOCKERHUB_USERNAME`：Docker Hub 用户名
-- `DOCKERHUB_TOKEN`：具有镜像写入权限的 Docker Hub Personal Access Token
-
-流水线会使用 GitHub 仓库名称作为 Docker Hub 仓库名称。发布后的镜像名称为：
-
-```text
-DOCKERHUB_USERNAME/GITHUB仓库名称
-```
-
-首次发布前需要在 Docker Hub 创建对应仓库。如果希望未登录用户也能拉取镜像，请将 Docker Hub 仓库设置为公开。
-
-建议的版本发布方式：
+仓库内的 Compose 文件用于构建当前本地源码：
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+docker compose up -d --build
 ```
 
-例如推送 `v1.2.3` 时，流水线会发布 `v1.2.3`、`1.2.3`、`1.2` 和 `latest`，同时生成 SBOM 和构建来源证明。Dependabot 每月检查 Docker 和 GitHub Actions 依赖更新。
-
-## 更新 NGINX 或 RTMP 模块
-
-不要只修改显示的版本号。需要同时更新 Dockerfile 中的版本、固定提交以及 SHA-256，并同步 Compose 文件，然后运行：
-
-```bash
-python3 -m unittest discover -s tests -v
-docker compose build --no-cache
-docker compose up -d
-docker compose ps
-```
-
-最后发送一条测试直播流，检查每个已启用平台是否能正常收到直播。
-
-## 本地开发
-
-管理服务只使用 Python 标准库，运行单元测试不需要安装额外依赖：
+运行不需要安装第三方依赖的 Python 测试：
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -164,10 +218,24 @@ app/server.py          管理 API、配置保存、NGINX 检查和重载
 app/static/            网页管理界面
 nginx/nginx.conf       固定的 NGINX 与 RTMP 配置
 tests/                 单元测试
-.github/workflows/     CI 和多架构镜像发布
+.github/workflows/     CI 和 Docker Hub 镜像发布
 Dockerfile             可复现的上游组件构建和运行镜像
-docker-compose.yml     本地部署配置
+docker-compose.yml     本地源码构建部署
 ```
+
+Docker Hub 发布流水线只会由严格的 `vX.Y.Z` Git 标签或手动执行触发。推送或合并到 `main` 不会发布镜像。
+
+## 上游组件
+
+本项目不存放、不修改 NGINX 或 nginx-rtmp-module 源码。只有在构建镜像时，才会下载并校验上游正式版本。
+
+| 组件 | 版本 | 来源 |
+| --- | --- | --- |
+| Alpine Linux | 3.24 | Alpine 官方镜像 |
+| NGINX | 1.30.3 stable | `nginx.org` 官方发布包 |
+| nginx-rtmp-module | 1.2.2 | 上游正式标签对应的固定提交 |
+
+Dockerfile 固定了下载文件的 SHA-256 和 RTMP 模块的准确提交。许可证信息参见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 许可证
 

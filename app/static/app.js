@@ -371,20 +371,39 @@ function normalizeLocale(locale) {
   return 'en';
 }
 
-function getInitialLocale() {
+function getBrowserLocale() {
+  return normalizeLocale(navigator.languages?.[0] || navigator.language);
+}
+
+function saveUiSettings(settings) {
   try {
-    return normalizeLocale(localStorage.getItem('relay-manager-locale') || navigator.language);
+    localStorage.setItem('relay-manager-ui-settings', JSON.stringify(settings));
+    localStorage.removeItem('relay-manager-locale');
+  } catch (_) { /* Storage may be unavailable. */ }
+}
+
+function loadUiSettings() {
+  try {
+    const stored = JSON.parse(localStorage.getItem('relay-manager-ui-settings') || '{}');
+    const legacyLocale = localStorage.getItem('relay-manager-locale');
+    const settings = { locale: normalizeLocale(stored.locale || legacyLocale || getBrowserLocale()) };
+    saveUiSettings(settings);
+    return settings;
   } catch (_) {
-    return normalizeLocale(navigator.language);
+    const settings = { locale: getBrowserLocale() };
+    saveUiSettings(settings);
+    return settings;
   }
 }
+
+const uiSettings = loadUiSettings();
 
 const state = {
   destinations: [],
   status: null,
   editingId: null,
   dialogInitial: null,
-  locale: getInitialLocale(),
+  locale: uiSettings.locale,
   saving: false,
   revealClientIps: false,
 };
@@ -770,7 +789,7 @@ function applyLanguage(locale) {
       element.setAttribute(attribute, t(element.dataset[`i18n${attribute.split('-').map((part) => part[0].toUpperCase() + part.slice(1)).join('')}`]));
     });
   });
-  try { localStorage.setItem('relay-manager-locale', state.locale); } catch (_) { /* Storage may be unavailable. */ }
+  saveUiSettings({ locale: state.locale });
   renderDestinations();
   updateDialogCopy();
   if (state.status) renderStatus(state.status);

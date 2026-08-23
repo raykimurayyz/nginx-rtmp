@@ -16,6 +16,7 @@ The project does **not** vendor or modify NGINX or nginx-rtmp-module source code
 - Restore the previous configuration if validation or reload fails.
 - Monitor NGINX health, aggregate and per-stream traffic, transfer totals, media metadata, and RTMP connections.
 - Mask client IP addresses by default, with an on-page control for temporary full-address display.
+- Provide English, Japanese, and Simplified Chinese, detect the browser language on first use, and store both detected and manually selected preferences per browser.
 - Run as an unprivileged user with all Linux capabilities dropped by Compose.
 - Build multi-platform images for `linux/amd64` and `linux/arm64` in GitHub Actions.
 

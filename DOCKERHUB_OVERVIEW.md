@@ -1,22 +1,23 @@
 # RTMP Relay Manager
 
-A lightweight, Dockerized NGINX RTMP relay with a simple web interface for multi-platform live streaming.
+A lightweight, self-hosted RTMP relay with a web interface. Send video from OBS, a PlayStation 4/5 or Xbox streaming setup, a camera, a hardware encoder, or any other RTMP-capable source, then relay it to multiple streaming platforms simultaneously.
 
-**Source code and documentation:** [raykimurayyz/nginx-rtmp](https://github.com/raykimurayyz/nginx-rtmp)
+**Documentation and source:** [github.com/raykimurayyz/nginx-rtmp](https://github.com/raykimurayyz/nginx-rtmp)
 
-## Features
+![RTMP Relay Manager dashboard](https://raw.githubusercontent.com/raykimurayyz/nginx-rtmp/main/docs/images/dashboard-en.png)
 
-- Receive an RTMP stream from OBS, PS5 workflows, cameras, or other publishers.
-- Configure relay destinations from a clean web interface.
-- Relay one input stream to multiple RTMP platforms simultaneously.
-- Enable, disable, edit, and remove destinations without manually editing NGINX.
-- Validate configuration before applying changes and restore the previous configuration on failure.
-- Monitor NGINX health, aggregate and per-stream traffic, transfer totals, media metadata, and RTMP connections.
-- Keep client IP addresses masked by default and reveal them temporarily when troubleshooting.
-- Detect English, Japanese, or Simplified Chinese from the browser on first use, fall back to English, and save both detected and manually selected preferences per browser.
-- Run as a non-root user on both AMD64 and ARM64 systems.
+## What you can do
+
+- Receive one local RTMP input and relay it to multiple destinations.
+- Add, edit, enable, disable, and remove platforms from a browser.
+- Monitor live bitrate, transferred traffic, media metadata, and RTMP connections.
+- Keep destination configuration when the container is replaced or upgraded.
+- Use English, Japanese, or Simplified Chinese automatically based on browser preferences.
+- Run without an external account or cloud control service.
 
 ## Quick start
+
+Create a Docker-managed volume and start the container:
 
 ```bash
 docker volume create nginx-rtmp-data
@@ -32,22 +33,26 @@ docker run -d \
   raykimurayyz/nginx-rtmp:latest
 ```
 
-Open the management interface:
+Open the management page:
 
 ```text
 http://YOUR_DOCKER_HOST:8080
 ```
 
-Configure OBS or another RTMP publisher:
+Add the RTMP server URL and stream key supplied by each destination platform.
+
+Configure OBS or another publisher:
 
 ```text
 Server:     rtmp://YOUR_DOCKER_HOST:1935/live
 Stream key: main
 ```
 
-Then open the management page and add the RTMP server URL and stream key supplied by each destination platform.
+Start streaming. The input is automatically relayed to every enabled destination.
 
 ## Docker Compose
+
+Create `compose.yaml`:
 
 ```yaml
 services:
@@ -69,57 +74,86 @@ volumes:
   nginx-rtmp-data:
 ```
 
-Start it with:
+Start it:
 
 ```bash
 docker compose up -d
 ```
 
+Check its status and logs:
+
+```bash
+docker compose ps
+docker compose logs -f
+```
+
+## Persistent configuration
+
+The application stores destinations and stream keys in:
+
+```text
+/data/config.json
+```
+
+Mount `/data` from a named volume as shown above. The volume exists independently of the container, so configuration remains available after the image or container is replaced.
+
+Do not run `docker compose down -v` unless you intentionally want to delete the saved configuration.
+
+Stream keys are stored as plain text inside the volume because NGINX needs them to connect to destination platforms. Protect access to the Docker host and its volumes.
+
+## Upgrade
+
+With Docker Compose:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+The existing `nginx-rtmp-data` volume is reused automatically.
+
+For reproducible deployments, replace `latest` in your Compose file with a complete version tag such as `v0.2.0`.
+
 ## Ports
 
 | Port | Purpose |
 | --- | --- |
-| `1935/tcp` | RTMP input from OBS, PS5 workflows, cameras, or other publishers |
+| `1935/tcp` | RTMP input from OBS, a game-console streaming setup, a camera, an encoder, or another RTMP-capable source |
 | `8080/tcp` | Web management interface and API |
 
-## Persistent data
-
-Configuration is stored in `/data/config.json`. Mount `/data` as a Docker volume to preserve destinations and stream keys when the container is recreated.
-
-Stream keys must be available to NGINX when it connects to destination platforms, so they are stored as plain text inside the Docker volume. Protect access to the Docker host and its volumes.
+The raw NGINX statistics endpoint listens only inside the container and is not published.
 
 ## Image tags
 
-- `latest` — the most recently published stable version.
-- `vX.Y.Z` — an immutable application release, for example `v0.1.2`.
-- `X.Y.Z` — the same release without the `v` prefix.
-- `X.Y` — the latest patch release within a minor version.
-
-For reproducible deployments, prefer a complete version tag:
-
-```bash
-docker pull raykimurayyz/nginx-rtmp:v0.1.2
-```
+- `latest` — most recently published stable version
+- `vX.Y.Z` — immutable application release
 
 ## Supported platforms
 
 - `linux/amd64`
 - `linux/arm64`
 
-## Important limitations
+## Health check
 
-- The current version supports plain RTMP destinations. RTMPS, SRT, transcoding, and platform-specific signing are not included.
-- If relay destinations are changed during a live stream, reconnect the input publisher once to guarantee that the new configuration takes effect.
-- There is intentionally no login page. Run this container only on a trusted private network and do not expose the management port directly to the public internet.
+The image includes a built-in HTTP health check. View the current state with:
 
-## Upstream components
+```bash
+docker inspect --format '{{.State.Health.Status}}' nginx-rtmp
+```
 
-The image builds verified upstream releases of NGINX and nginx-rtmp-module. Their source code is not vendored or modified by this project.
+## Important usage notes
 
-## License
+- This image supports plain `rtmp://` destinations. RTMPS, SRT, transcoding, and platform-specific signing are not included.
+- If destinations are changed while a publisher is already connected, reconnect the input stream once to guarantee that the new configuration takes effect.
+- An RTMP output connection does not guarantee that the destination platform has approved or publicly started the broadcast.
+- There is intentionally no login page. Use the management interface only on a trusted private network and do not expose port `8080` directly to the public internet.
 
-The original RTMP Relay Manager code is licensed under the MIT License. NGINX and nginx-rtmp-module remain subject to their respective 2-clause BSD licenses. Complete license texts and third-party notices are included in the image and the GitHub repository.
+## Upstream components and license
 
-Full documentation, source code, license notices, issue tracking, and release workflow are available on GitHub:
+The image builds verified, unmodified releases of NGINX and nginx-rtmp-module on Alpine Linux.
+
+The original RTMP Relay Manager code is licensed under the MIT License. NGINX and nginx-rtmp-module retain their respective BSD 2-Clause licenses. The corresponding license texts are included in the image under `/usr/share/licenses/`.
+
+For complete usage instructions, security details, development information, and third-party notices, visit:
 
 **[github.com/raykimurayyz/nginx-rtmp](https://github.com/raykimurayyz/nginx-rtmp)**

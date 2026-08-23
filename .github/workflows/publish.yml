@@ -73,4 +73,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ steps.image.outputs.name }}
           readme-filepath: ./DOCKERHUB_OVERVIEW.md
-          short-description: A lightweight, Dockerized NGINX RTMP relay with a simple web interface.
+          short-description: A self-hosted web interface for relaying one RTMP stream to multiple platforms.

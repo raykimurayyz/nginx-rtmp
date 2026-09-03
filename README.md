@@ -24,10 +24,12 @@ A self-hosted web interface for managing NGINX RTMP input applications and relay
 ## How it works
 
 ```text
-PlayStation /app ──┐
-OBS /live ─────────┼──> RTMP Relay Manager ──> selected destinations
-Camera /camera ────┘
+PlayStation /app ──┐                         ┌──> YouTube
+OBS /live ─────────┼──> RTMP Relay Manager ──┼──> Twitch
+Camera /camera ────┘                         └──> Other platforms
 ```
+
+Each input route can be assigned independently to one or more destinations. A single incoming stream can therefore be relayed to multiple enabled platforms at the same time.
 
 The application uses NGINX with nginx-rtmp-module for media transport and a small management service for route configuration, validation, safe reloads, recovery, and status reporting. New installations include enabled `app` and `live` input routes; they have no relay destinations until you assign them in the browser.
 

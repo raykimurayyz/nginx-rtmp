@@ -4,11 +4,6 @@ ARG ALPINE_MIRROR=dl-cdn.alpinelinux.org
 FROM alpine:${ALPINE_VERSION} AS builder
 
 ARG ALPINE_MIRROR
-ARG NGINX_VERSION=1.30.3
-ARG NGINX_SHA256=e5823dc6f45610993def93ebf6cfce68264af4958c77e874b7d20f3709001b8f
-ARG NGINX_RTMP_VERSION=1.2.2
-ARG NGINX_RTMP_COMMIT=23e1873aa62acb58b7881eed2a501f5bf35b82e9
-ARG NGINX_RTMP_SHA256=b688919355c0acccdda24eb83c6306df3d450cb0b13664f16b8e3d1f521c3bb5
 
 RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories \
     && apk add --no-cache \
@@ -19,6 +14,12 @@ RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories \
         openssl-dev \
         pcre2-dev \
         zlib-dev
+
+ARG NGINX_VERSION=1.30.4
+ARG NGINX_SHA256=4261dc90e9e47c1c4041276e9aaa3d48ebe2e664f728e14fa95ae6c67d57a08b
+ARG NGINX_RTMP_VERSION=1.2.2
+ARG NGINX_RTMP_COMMIT=23e1873aa62acb58b7881eed2a501f5bf35b82e9
+ARG NGINX_RTMP_SHA256=b688919355c0acccdda24eb83c6306df3d450cb0b13664f16b8e3d1f521c3bb5
 
 WORKDIR /tmp/build
 
@@ -64,14 +65,6 @@ RUN ./configure \
 FROM alpine:${ALPINE_VERSION} AS runtime
 
 ARG ALPINE_MIRROR
-ARG NGINX_VERSION=1.30.3
-ARG NGINX_RTMP_VERSION=1.2.2
-
-LABEL org.opencontainers.image.title="RTMP Relay Manager" \
-      org.opencontainers.image.description="Web-managed NGINX RTMP relay for private networks" \
-      org.opencontainers.image.licenses="MIT" \
-      io.github.rtmp-relay-manager.nginx.version="${NGINX_VERSION}" \
-      io.github.rtmp-relay-manager.nginx-rtmp-module.version="${NGINX_RTMP_VERSION}"
 
 RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories \
     && apk upgrade --no-cache \
@@ -84,8 +77,17 @@ RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories \
         zlib \
     && addgroup -S -g 10001 streamer \
     && adduser -S -D -H -u 10001 -G streamer -s /sbin/nologin streamer \
-    && mkdir -p /data /etc/nginx/generated /opt/relay-manager/static /usr/share/licenses/rtmp-relay-manager /usr/share/licenses/nginx /usr/share/licenses/nginx-rtmp-module \
-    && chown -R streamer:streamer /data /etc/nginx/generated
+    && mkdir -p /data /opt/relay-manager/static /usr/share/licenses/rtmp-relay-manager /usr/share/licenses/nginx /usr/share/licenses/nginx-rtmp-module \
+    && chown -R streamer:streamer /data
+
+ARG NGINX_VERSION=1.30.4
+ARG NGINX_RTMP_VERSION=1.2.2
+
+LABEL org.opencontainers.image.title="RTMP Relay Manager" \
+      org.opencontainers.image.description="Web-managed NGINX RTMP relay for private networks" \
+      org.opencontainers.image.licenses="MIT" \
+      io.github.rtmp-relay-manager.nginx.version="${NGINX_VERSION}" \
+      io.github.rtmp-relay-manager.nginx-rtmp-module.version="${NGINX_RTMP_VERSION}"
 
 COPY --from=builder /usr/local/sbin/nginx /usr/local/sbin/nginx
 COPY LICENSE /usr/share/licenses/rtmp-relay-manager/LICENSE
@@ -99,7 +101,7 @@ ENV APP_HOST=0.0.0.0 \
     APP_PORT=8080 \
     DATA_DIR=/data \
     NGINX_CONFIG=/etc/nginx/nginx.conf \
-    NGINX_GENERATED_CONFIG=/etc/nginx/generated/push.conf \
+    NGINX_GENERATED_CONFIG=/tmp/nginx-generated/rtmp.conf \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 

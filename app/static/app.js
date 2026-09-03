@@ -1,18 +1,28 @@
 const TRANSLATIONS = {
   en: {
-    'meta.description': 'A local dashboard for relaying one RTMP stream to multiple platforms.',
+    'meta.description': 'A local dashboard for managing RTMP input applications and relay destinations.',
     'brand.homeAria': 'RTMP Relay Manager home',
     'language.label': 'Language',
     'hero.eyebrow': 'PRIVATE STREAM GATEWAY',
-    'hero.titlePrimary': 'One live stream,',
-    'hero.titleAccent': 'relayed everywhere.',
-    'hero.description': 'Send video from OBS, a game-console setup, a camera, or any other RTMP source, then securely relay it to every enabled platform.',
-    'ingest.title': 'Local ingest URL',
+    'hero.titlePrimary': 'Your RTMP inputs,',
+    'hero.titleAccent': 'routed your way.',
+    'hero.description': 'Receive video from OBS, a game-console setup, a camera, or any other RTMP source, then route each input to the platforms you choose.',
+    'ingest.title': 'Local ingest routes',
     'ingest.waiting': 'Waiting for stream',
     'ingest.live': '● Live',
     'ingest.copy': 'Copy',
     'ingest.copyAria': 'Copy ingest URL',
     'ingest.description': 'Use this server URL in your streaming software. The stream name can be customized.',
+    'routes.eyebrow': 'INPUT ROUTES',
+    'routes.title': 'RTMP applications',
+    'routes.description': 'Create one application path for each input workflow and choose where it should be relayed.',
+    'routes.add': 'Add input route',
+    'routes.emptyTitle': 'No input routes',
+    'routes.emptyDescription': 'Add an RTMP application before publishing a stream.',
+    'routes.application': 'Application',
+    'routes.destinations': '{count} destinations',
+    'routes.playAllowed': 'Playback allowed',
+    'routes.playDenied': 'Relay only',
     'metrics.ariaLabel': 'Runtime status',
     'metrics.gateway': 'Gateway status',
     'metrics.input': 'Input streams',
@@ -32,7 +42,7 @@ const TRANSLATIONS = {
     'connection.managerOffline': 'Manager connection failed',
     'workspace.eyebrow': 'DESTINATIONS',
     'workspace.title': 'Relay destinations',
-    'workspace.description': 'Enter the RTMP server URL and stream key supplied by each platform.',
+    'workspace.description': 'Add a server and stream key, or a complete RTMP push URL, then choose its input routes.',
     'workspace.add': 'Add platform',
     'empty.title': 'No relay destinations yet',
     'empty.description': 'Add YouTube, Twitch, or any other platform that supports RTMP.',
@@ -91,6 +101,15 @@ const TRANSLATIONS = {
     'dialog.namePlaceholder': 'For example: YouTube',
     'dialog.server': 'RTMP server URL',
     'dialog.serverHelp': 'Enter the server URL supplied by the platform. RTMP is currently supported.',
+    'dialog.mode': 'Address format',
+    'dialog.modeSeparate': 'Server URL and stream key',
+    'dialog.modeFull': 'Complete RTMP push URL',
+    'dialog.fullUrl': 'Complete RTMP push URL',
+    'dialog.fullUrlPlaceholder': 'rtmp://example.com/app/key',
+    'dialog.fullUrlHelp': 'Use this when the platform provides one complete address containing its key or query parameters.',
+    'dialog.editFullUrlHelp': 'Leave blank to keep the saved complete URL.',
+    'dialog.routes': 'Input routes',
+    'dialog.routesHelp': 'Only selected input routes relay to this destination.',
     'dialog.key': 'Stream key',
     'dialog.keyPlaceholder': 'Enter the stream key supplied by the platform',
     'dialog.show': 'Show',
@@ -105,6 +124,11 @@ const TRANSLATIONS = {
     'dialog.discardConfirm': 'Discard the unsaved changes?',
     'destination.savedKey': 'Key {hint}',
     'destination.saved': 'saved',
+    'destination.fullUrlSaved': 'Complete push URL saved',
+    'destination.routes': '{count} input routes',
+    'destination.routesLabel': 'Input routes',
+    'destination.unassigned': 'No input route assigned',
+    'destination.moreRoutes': 'Show {count} more input routes',
     'destination.server': 'RTMP server',
     'destination.enabled': '● Enabled',
     'destination.disabled': '○ Disabled',
@@ -118,22 +142,58 @@ const TRANSLATIONS = {
     'toast.stateUpdated': 'Platform status updated.',
     'toast.copied': 'Ingest URL copied.',
     'toast.copyFailed': 'Could not copy automatically. Please copy the URL manually.',
+    'toast.warning.streamReconnectRequired': 'Reconnect active publishers so the new configuration takes effect.',
+    'routeDialog.eyebrow': 'INPUT ROUTE',
+    'routeDialog.addTitle': 'Add input route',
+    'routeDialog.editTitle': 'Edit input route',
+    'routeDialog.name': 'Route name',
+    'routeDialog.namePlaceholder': 'For example: PlayStation',
+    'routeDialog.application': 'Application path',
+    'routeDialog.applicationHelp': 'The path after the RTMP host, such as app or live.',
+    'routeDialog.enabled': 'Enable route',
+    'routeDialog.enabledHelp': 'Accept new publishers on this application',
+    'routeDialog.allowPlay': 'Allow local playback',
+    'routeDialog.allowPlayHelp': 'Required when OBS or VLC needs to pull the incoming stream',
+    'routeDialog.advanced': 'Advanced RTMP settings',
+    'routeDialog.reconnect': 'Push reconnect delay (seconds)',
+    'routeDialog.dropIdle': 'Drop idle publisher after (seconds)',
+    'routeDialog.zeroDisabled': 'Use 0 to disable.',
+    'routeDialog.idleStreams': 'Allow idle streams',
+    'routeDialog.waitKey': 'Wait for a video keyframe',
+    'routeDialog.deleteConfirm': 'Delete input route “{name}”?',
+    'settings.open': 'Server settings',
+    'settings.eyebrow': 'RTMP SERVER',
+    'settings.title': 'Server settings',
+    'settings.chunkSize': 'Chunk size',
+    'settings.ping': 'Ping interval (seconds)',
+    'settings.pingTimeout': 'Ping timeout (seconds)',
+    'settings.portNote': 'The internal RTMP port remains 1935 because Docker port mappings cannot be changed from this page.',
     'api.requestFailed': 'Request failed ({status})',
   },
   ja: {
-    'meta.description': '1つのRTMP配信を複数のプラットフォームへ中継するローカル管理画面です。',
+    'meta.description': 'RTMP入力アプリケーションと中継先を管理するローカル管理画面です。',
     'brand.homeAria': 'RTMP Relay Manager ホーム',
     'language.label': '言語',
     'hero.eyebrow': 'プライベート配信ゲートウェイ',
-    'hero.titlePrimary': '1つのライブ配信を、',
-    'hero.titleAccent': '複数のプラットフォームへ。',
-    'hero.description': 'OBS、PlayStationやXboxなどのゲーム機環境、カメラ、その他のRTMP映像ソースから受信し、有効な配信先へ安全に中継します。',
-    'ingest.title': 'ローカル配信URL',
+    'hero.titlePrimary': 'RTMP入力を、',
+    'hero.titleAccent': '自由にルーティング。',
+    'hero.description': 'OBS、PlayStationやXboxなどのゲーム機環境、カメラ、その他のRTMP映像ソースから受信し、入力ごとに選択した配信先へ中継します。',
+    'ingest.title': 'ローカル入力ルート',
     'ingest.waiting': '配信待機中',
     'ingest.live': '● 配信中',
     'ingest.copy': 'コピー',
     'ingest.copyAria': '配信URLをコピー',
     'ingest.description': '配信ソフトにこのサーバーURLを入力してください。ストリーム名は自由に設定できます。',
+    'routes.eyebrow': '入力ルート',
+    'routes.title': 'RTMP アプリケーション',
+    'routes.description': '入力方式ごとにアプリケーションパスを作成し、中継先を選択します。',
+    'routes.add': '入力ルートを追加',
+    'routes.emptyTitle': '入力ルートがありません',
+    'routes.emptyDescription': '配信する前に RTMP アプリケーションを追加してください。',
+    'routes.application': 'アプリケーション',
+    'routes.destinations': '配信先 {count} 件',
+    'routes.playAllowed': 'ローカル再生可',
+    'routes.playDenied': '中継専用',
     'metrics.ariaLabel': '稼働状況',
     'metrics.gateway': 'ゲートウェイ状態',
     'metrics.input': '入力ストリーム',
@@ -153,7 +213,7 @@ const TRANSLATIONS = {
     'connection.managerOffline': '管理サービスへの接続に失敗',
     'workspace.eyebrow': '配信先',
     'workspace.title': '中継先プラットフォーム',
-    'workspace.description': '各プラットフォームから提供されたRTMPサーバーURLとストリームキーを入力します。',
+    'workspace.description': 'サーバーURLとストリームキー、または完全なRTMP配信URLを追加し、入力ルートを選択します。',
     'workspace.add': '配信先を追加',
     'empty.title': '配信先がありません',
     'empty.description': 'YouTube、Twitch、その他RTMP対応の配信先を追加してください。',
@@ -212,6 +272,15 @@ const TRANSLATIONS = {
     'dialog.namePlaceholder': '例：YouTube',
     'dialog.server': 'RTMPサーバーURL',
     'dialog.serverHelp': 'プラットフォームが提供するサーバーURLを入力してください。現在はRTMPに対応しています。',
+    'dialog.mode': 'アドレス形式',
+    'dialog.modeSeparate': 'サーバーURLとストリームキー',
+    'dialog.modeFull': '完全なRTMPプッシュURL',
+    'dialog.fullUrl': '完全なRTMPプッシュURL',
+    'dialog.fullUrlPlaceholder': 'rtmp://example.com/app/key',
+    'dialog.fullUrlHelp': 'キーやクエリを含む完全なURLが提供された場合に使用します。',
+    'dialog.editFullUrlHelp': '空欄のままにすると保存済みURLを使用します。',
+    'dialog.routes': '入力ルート',
+    'dialog.routesHelp': '選択した入力ルートだけがこの配信先へ中継します。',
     'dialog.key': 'ストリームキー',
     'dialog.keyPlaceholder': 'プラットフォームが提供するストリームキーを入力',
     'dialog.show': '表示',
@@ -226,6 +295,11 @@ const TRANSLATIONS = {
     'dialog.discardConfirm': '保存していない変更を破棄しますか？',
     'destination.savedKey': 'キー {hint}',
     'destination.saved': '保存済み',
+    'destination.fullUrlSaved': '完全な配信URLを保存済み',
+    'destination.routes': '入力ルート {count} 件',
+    'destination.routesLabel': '入力ルート',
+    'destination.unassigned': '入力ルートが未設定です',
+    'destination.moreRoutes': '残り {count} 件の入力ルートを表示',
     'destination.server': 'RTMPサーバー',
     'destination.enabled': '● 有効',
     'destination.disabled': '○ 無効',
@@ -239,22 +313,58 @@ const TRANSLATIONS = {
     'toast.stateUpdated': '配信先の状態を更新しました。',
     'toast.copied': '配信URLをコピーしました。',
     'toast.copyFailed': '自動コピーに失敗しました。手動でURLをコピーしてください。',
+    'toast.warning.streamReconnectRequired': '新しい設定を反映するため、配信元を再接続してください。',
+    'routeDialog.eyebrow': '入力ルート',
+    'routeDialog.addTitle': '入力ルートを追加',
+    'routeDialog.editTitle': '入力ルートを編集',
+    'routeDialog.name': 'ルート名',
+    'routeDialog.namePlaceholder': '例：PlayStation',
+    'routeDialog.application': 'アプリケーションパス',
+    'routeDialog.applicationHelp': 'RTMPホストの後ろに付く app や live などのパスです。',
+    'routeDialog.enabled': 'ルートを有効化',
+    'routeDialog.enabledHelp': 'このアプリケーションへの新規配信を受け付けます',
+    'routeDialog.allowPlay': 'ローカル再生を許可',
+    'routeDialog.allowPlayHelp': 'OBSやVLCで入力配信を取得する場合に必要です',
+    'routeDialog.advanced': 'RTMP 詳細設定',
+    'routeDialog.reconnect': 'プッシュ再接続待機（秒）',
+    'routeDialog.dropIdle': 'アイドル配信を切断（秒）',
+    'routeDialog.zeroDisabled': '0 で無効になります。',
+    'routeDialog.idleStreams': 'アイドルストリームを許可',
+    'routeDialog.waitKey': '映像キーフレームを待機',
+    'routeDialog.deleteConfirm': '入力ルート「{name}」を削除しますか？',
+    'settings.open': 'サーバー設定',
+    'settings.eyebrow': 'RTMP サーバー',
+    'settings.title': 'サーバー設定',
+    'settings.chunkSize': 'チャンクサイズ',
+    'settings.ping': 'Ping間隔（秒）',
+    'settings.pingTimeout': 'Pingタイムアウト（秒）',
+    'settings.portNote': 'Dockerのポート割り当てはこの画面から変更できないため、内部RTMPポートは1935のままです。',
     'api.requestFailed': 'リクエストに失敗しました（{status}）',
   },
   'zh-CN': {
-    'meta.description': '局域网 RTMP 多平台转推管理面板',
+    'meta.description': '用于管理 RTMP 输入 Application 和转推目的地的局域网面板',
     'brand.homeAria': 'RTMP Relay Manager 首页',
     'language.label': '语言',
     'hero.eyebrow': '私有直播网关',
-    'hero.titlePrimary': '一条直播流，',
-    'hero.titleAccent': '转推到多个平台。',
-    'hero.description': '从 OBS、PlayStation 或 Xbox 等游戏主机方案、摄像机及其他 RTMP 视频源接收直播，再安全转推到所有已启用的平台。',
-    'ingest.title': '本机推流地址',
+    'hero.titlePrimary': '多组 RTMP 输入，',
+    'hero.titleAccent': '按需转推。',
+    'hero.description': '从 OBS、PlayStation 或 Xbox 等游戏主机方案、摄像机及其他 RTMP 视频源接收直播，再将每组输入转推到指定的平台。',
+    'ingest.title': '本机输入路由',
     'ingest.waiting': '等待直播流',
     'ingest.live': '● 正在直播',
     'ingest.copy': '复制',
     'ingest.copyAria': '复制推流地址',
     'ingest.description': '在推流软件中填写此服务器地址，串流名称可以自定义。',
+    'routes.eyebrow': '输入路由',
+    'routes.title': 'RTMP Applications',
+    'routes.description': '为不同输入方式创建独立的 Application 路径，并选择对应的转推目的地。',
+    'routes.add': '添加输入路由',
+    'routes.emptyTitle': '还没有输入路由',
+    'routes.emptyDescription': '推流前请先添加一个 RTMP Application。',
+    'routes.application': 'Application',
+    'routes.destinations': '{count} 个目的地',
+    'routes.playAllowed': '允许本地拉流',
+    'routes.playDenied': '仅用于转推',
     'metrics.ariaLabel': '运行状态',
     'metrics.gateway': '网关状态',
     'metrics.input': '输入直播流',
@@ -274,7 +384,7 @@ const TRANSLATIONS = {
     'connection.managerOffline': '管理服务连接失败',
     'workspace.eyebrow': '推流目的地',
     'workspace.title': '推流目的地',
-    'workspace.description': '填写平台提供的 RTMP 服务器地址和串流密钥。',
+    'workspace.description': '添加服务器地址和串流密钥，或完整 RTMP 推流地址，然后选择对应的输入路由。',
     'workspace.add': '添加平台',
     'empty.title': '还没有推流目的地',
     'empty.description': '添加哔哩哔哩、斗鱼、虎牙或其他支持 RTMP 的直播平台。',
@@ -333,6 +443,15 @@ const TRANSLATIONS = {
     'dialog.namePlaceholder': '例如：哔哩哔哩',
     'dialog.server': 'RTMP 服务器地址',
     'dialog.serverHelp': '填写平台提供的服务器地址，目前支持 RTMP。',
+    'dialog.mode': '地址格式',
+    'dialog.modeSeparate': '服务器地址和串流密钥',
+    'dialog.modeFull': '完整 RTMP 推流地址',
+    'dialog.fullUrl': '完整 RTMP 推流地址',
+    'dialog.fullUrlPlaceholder': 'rtmp://example.com/app/key',
+    'dialog.fullUrlHelp': '平台只提供一个包含密钥或查询参数的完整地址时使用。',
+    'dialog.editFullUrlHelp': '留空会继续使用已保存的完整地址。',
+    'dialog.routes': '输入路由',
+    'dialog.routesHelp': '只有选中的输入路由才会转推到这个目的地。',
     'dialog.key': '串流密钥',
     'dialog.keyPlaceholder': '填写平台提供的串流密钥',
     'dialog.show': '显示',
@@ -347,6 +466,11 @@ const TRANSLATIONS = {
     'dialog.discardConfirm': '确定放弃尚未保存的更改吗？',
     'destination.savedKey': '密钥 {hint}',
     'destination.saved': '已保存',
+    'destination.fullUrlSaved': '已保存完整推流地址',
+    'destination.routes': '{count} 个输入路由',
+    'destination.routesLabel': '输入路由',
+    'destination.unassigned': '未绑定输入路由',
+    'destination.moreRoutes': '显示其余 {count} 个输入路由',
     'destination.server': 'RTMP 服务器',
     'destination.enabled': '● 已启用',
     'destination.disabled': '○ 已停用',
@@ -360,6 +484,32 @@ const TRANSLATIONS = {
     'toast.stateUpdated': '平台状态已更新。',
     'toast.copied': '推流地址已复制。',
     'toast.copyFailed': '无法自动复制，请手动复制地址。',
+    'toast.warning.streamReconnectRequired': '请重新连接正在推流的设备，让新配置完整生效。',
+    'routeDialog.eyebrow': '输入路由',
+    'routeDialog.addTitle': '添加输入路由',
+    'routeDialog.editTitle': '编辑输入路由',
+    'routeDialog.name': '路由名称',
+    'routeDialog.namePlaceholder': '例如：PlayStation',
+    'routeDialog.application': 'Application 路径',
+    'routeDialog.applicationHelp': 'RTMP 主机地址后面的路径，例如 app 或 live。',
+    'routeDialog.enabled': '启用路由',
+    'routeDialog.enabledHelp': '允许新的推流端连接到这个 Application',
+    'routeDialog.allowPlay': '允许本地拉流',
+    'routeDialog.allowPlayHelp': '需要使用 OBS 或 VLC 拉取输入流时必须开启',
+    'routeDialog.advanced': 'RTMP 高级设置',
+    'routeDialog.reconnect': '转推重连间隔（秒）',
+    'routeDialog.dropIdle': '空闲推流端断开时间（秒）',
+    'routeDialog.zeroDisabled': '填写 0 表示关闭。',
+    'routeDialog.idleStreams': '允许空闲直播流',
+    'routeDialog.waitKey': '等待视频关键帧',
+    'routeDialog.deleteConfirm': '确定删除输入路由“{name}”吗？',
+    'settings.open': '服务器设置',
+    'settings.eyebrow': 'RTMP 服务器',
+    'settings.title': '服务器设置',
+    'settings.chunkSize': 'Chunk 大小',
+    'settings.ping': 'Ping 间隔（秒）',
+    'settings.pingTimeout': 'Ping 超时（秒）',
+    'settings.portNote': 'Docker 端口映射无法从页面修改，因此容器内部 RTMP 端口固定为 1935。',
     'api.requestFailed': '请求失败（{status}）',
   },
 };
@@ -399,24 +549,28 @@ function loadUiSettings() {
 const uiSettings = loadUiSettings();
 
 const state = {
-  destinations: [],
+  config: { version: 2, revision: 1, settings: {}, routes: [], destinations: [] },
   status: null,
-  editingId: null,
-  dialogInitial: null,
+  editingDestinationId: null,
+  editingRouteId: null,
+  snapshots: {},
   locale: uiSettings.locale,
   saving: false,
   revealClientIps: false,
 };
 
 const elements = {
-  dialog: document.querySelector('#destination-dialog'),
-  form: document.querySelector('#destination-form'),
-  list: document.querySelector('#destination-list'),
-  empty: document.querySelector('#empty-state'),
+  destinationDialog: document.querySelector('#destination-dialog'),
+  destinationForm: document.querySelector('#destination-form'),
+  destinationList: document.querySelector('#destination-list'),
+  destinationEmpty: document.querySelector('#empty-state'),
+  routeDialog: document.querySelector('#route-dialog'),
+  routeForm: document.querySelector('#route-form'),
+  routeList: document.querySelector('#route-list'),
+  routeEmpty: document.querySelector('#route-empty'),
+  settingsDialog: document.querySelector('#settings-dialog'),
+  settingsForm: document.querySelector('#settings-form'),
   toast: document.querySelector('#toast'),
-  save: document.querySelector('#save-destination'),
-  cancel: document.querySelector('#cancel-destination'),
-  close: document.querySelector('#close-dialog'),
   language: document.querySelector('#language-select'),
 };
 
@@ -431,6 +585,15 @@ function escapeHtml(value) {
   })[character]);
 }
 
+function newId() {
+  if (globalThis.crypto?.getRandomValues) {
+    const bytes = new Uint8Array(16);
+    globalThis.crypto.getRandomValues(bytes);
+    return [...bytes].map((value) => value.toString(16).padStart(2, '0')).join('');
+  }
+  return Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+}
+
 function showToast(message, error = false) {
   elements.toast.textContent = message;
   elements.toast.className = `toast show${error ? ' error' : ''}`;
@@ -438,25 +601,65 @@ function showToast(message, error = false) {
   showToast.timer = setTimeout(() => { elements.toast.className = 'toast'; }, 4200);
 }
 
+function clearDialogError(dialog) {
+  const error = dialog.querySelector('.dialog-error');
+  error.textContent = '';
+  error.hidden = true;
+}
+
+function showDialogError(dialog, message) {
+  const error = dialog.querySelector('.dialog-error');
+  error.textContent = message;
+  error.hidden = false;
+  error.focus({ preventScroll: true });
+  error.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
 async function api(path, options = {}) {
-  const response = await fetch(path, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-  });
-  const payload = await response.json();
-  if (!response.ok) throw new Error(payload.error || t('api.requestFailed', { status: response.status }));
-  return payload;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), options.timeout || 10000);
+  try {
+    const response = await fetch(path, {
+      ...options,
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || t('api.requestFailed', { status: response.status }));
+    return payload;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function renderDestinations() {
-  elements.empty.hidden = state.destinations.length > 0;
-  elements.list.innerHTML = state.destinations.map((item) => `
+  const destinations = state.config.destinations;
+  elements.destinationEmpty.hidden = destinations.length > 0;
+  elements.destinationList.innerHTML = destinations.map((item) => {
+    const assignedRoutes = state.config.routes.filter((route) => route.destinationIds.includes(item.id));
+    const routeChips = assignedRoutes.length ? assignedRoutes.map((route, index) => `
+      <span class="route-chip${index >= 3 ? ' route-chip-overflow' : ''}"${index >= 3 ? ' hidden' : ''} title="${escapeHtml(`${route.name} /${route.application}`)}">
+        <span>${escapeHtml(route.name)}</span><code>/${escapeHtml(route.application)}</code>
+      </span>
+    `).join('') : `<span class="route-chip unassigned">${escapeHtml(t('destination.unassigned'))}</span>`;
+    const remainingRoutes = Math.max(assignedRoutes.length - 3, 0);
+    const address = item.mode === 'fullUrl' ? item.pushUrlHint : item.serverUrl;
+    const secretHint = item.mode === 'fullUrl'
+      ? t('destination.fullUrlSaved')
+      : t('destination.savedKey', { hint: item.streamKeyHint || t('destination.saved') });
+    return `
     <article class="destination-card${item.enabled ? '' : ' disabled'}" data-id="${escapeHtml(item.id)}">
       <div class="destination-name">
         <span class="platform-icon">${escapeHtml(item.name.slice(0, 1).toUpperCase())}</span>
-        <div><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(t('destination.savedKey', { hint: item.streamKeyHint || t('destination.saved') }))}</small></div>
+        <div><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml(secretHint)}</small></div>
       </div>
-      <div class="destination-url"><strong>${escapeHtml(item.serverUrl)}</strong><small>${escapeHtml(t('destination.server'))}</small></div>
+      <div class="destination-url">
+        <strong>${escapeHtml(address || '—')}</strong>
+        <div class="destination-routing">
+          <small>${escapeHtml(t('destination.routesLabel'))}</small>
+          <div class="route-chips">${routeChips}${remainingRoutes ? `<button class="route-chip route-chip-more" type="button" data-action="expand-routes" aria-label="${escapeHtml(t('destination.moreRoutes', { count: remainingRoutes }))}">+${remainingRoutes}</button>` : ''}</div>
+        </div>
+      </div>
       <span class="state-label${item.enabled ? ' enabled' : ''}">${escapeHtml(t(item.enabled ? 'destination.enabled' : 'destination.disabled'))}</span>
       <div class="card-actions">
         <button type="button" data-action="toggle">${escapeHtml(t(item.enabled ? 'destination.disable' : 'destination.enable'))}</button>
@@ -464,100 +667,188 @@ function renderDestinations() {
         <button class="delete" type="button" data-action="delete">${escapeHtml(t('destination.delete'))}</button>
       </div>
     </article>
-  `).join('');
+  `; }).join('');
 }
 
-function dialogSnapshot() {
+function ingestUrl(application) {
+  const host = window.location.hostname || 'localhost';
+  return `rtmp://${host}:1935/${application}`;
+}
+
+function renderIngestRoutes() {
+  const routes = state.config.routes.filter((route) => route.enabled);
+  document.querySelector('#ingest-routes').innerHTML = routes.length ? routes.map((route) => `
+    <div class="url-box ingest-route-url">
+      <span class="ingest-route-name">${escapeHtml(route.name)}</span>
+      <code>${escapeHtml(ingestUrl(route.application))}</code>
+      <button class="icon-button" type="button" data-copy-url="${escapeHtml(ingestUrl(route.application))}">${escapeHtml(t('ingest.copy'))}</button>
+    </div>
+  `).join('') : '<span class="state-label">—</span>';
+}
+
+function renderRoutes() {
+  const routes = state.config.routes;
+  elements.routeEmpty.hidden = routes.length > 0;
+  elements.routeList.innerHTML = routes.map((route) => `
+    <article class="route-card${route.enabled ? '' : ' disabled'}" data-id="${escapeHtml(route.id)}">
+      <div class="route-main"><span class="platform-icon">⇥</span><div><strong>${escapeHtml(route.name)}</strong><small>${escapeHtml(t('routes.application'))}: /${escapeHtml(route.application)}</small></div></div>
+      <code>${escapeHtml(ingestUrl(route.application))}</code>
+      <div class="route-meta"><span>${escapeHtml(t('routes.destinations', { count: route.destinationIds.length }))}</span><span>${escapeHtml(t(route.allowPlay ? 'routes.playAllowed' : 'routes.playDenied'))}</span></div>
+      <div class="card-actions"><button type="button" data-action="toggle">${escapeHtml(t(route.enabled ? 'destination.disable' : 'destination.enable'))}</button><button type="button" data-action="edit">${escapeHtml(t('destination.edit'))}</button><button class="delete" type="button" data-action="delete">${escapeHtml(t('destination.delete'))}</button></div>
+    </article>
+  `).join('');
+  renderIngestRoutes();
+}
+
+function renderAllConfig() {
+  renderRoutes();
+  renderDestinations();
+}
+
+function destinationSnapshot() {
   return JSON.stringify({
     name: document.querySelector('#destination-name').value,
+    mode: document.querySelector('#destination-mode').value,
     serverUrl: document.querySelector('#server-url').value,
     streamKey: document.querySelector('#stream-key').value,
+    pushUrl: document.querySelector('#push-url').value,
     enabled: document.querySelector('#destination-enabled').checked,
+    routeIds: [...document.querySelectorAll('#destination-route-options input:checked')].map((input) => input.value).sort(),
   });
 }
 
 function updateDialogCopy() {
-  document.querySelector('#dialog-title').textContent = t(state.editingId ? 'dialog.editTitle' : 'dialog.addTitle');
-  document.querySelector('#key-help').textContent = t(state.editingId ? 'dialog.editKeyHelp' : 'dialog.newKeyHelp');
+  document.querySelector('#dialog-title').textContent = t(state.editingDestinationId ? 'dialog.editTitle' : 'dialog.addTitle');
+  document.querySelector('#key-help').textContent = t(state.editingDestinationId ? 'dialog.editKeyHelp' : 'dialog.newKeyHelp');
+  document.querySelector('#push-url-help').textContent = t(state.editingDestinationId ? 'dialog.editFullUrlHelp' : 'dialog.fullUrlHelp');
   const keyInput = document.querySelector('#stream-key');
   document.querySelector('#toggle-key').textContent = t(keyInput.type === 'password' ? 'dialog.show' : 'dialog.hide');
-  if (!state.saving) elements.save.textContent = t('dialog.save');
+  const pushInput = document.querySelector('#push-url');
+  document.querySelector('#toggle-push-url').textContent = t(pushInput.type === 'password' ? 'dialog.show' : 'dialog.hide');
+  if (!state.saving) document.querySelector('#save-destination').textContent = t('dialog.save');
 }
 
-function openDialog(item = null) {
-  state.editingId = item?.id || null;
+function renderDestinationRouteOptions(destinationId = null) {
+  const container = document.querySelector('#destination-route-options');
+  container.innerHTML = state.config.routes.length ? state.config.routes.map((route) => `
+    <label><input type="checkbox" value="${escapeHtml(route.id)}" ${destinationId && route.destinationIds.includes(destinationId) ? 'checked' : ''}><span>${escapeHtml(route.name)} <small>/${escapeHtml(route.application)}</small></span></label>
+  `).join('') : `<span class="state-label">${escapeHtml(t('routes.emptyTitle'))}</span>`;
+}
+
+function updateDestinationMode() {
+  const selectedMode = document.querySelector('#destination-mode').value;
+  const full = selectedMode === 'fullUrl';
+  const existing = state.config.destinations.find((item) => item.id === state.editingDestinationId);
+  const needsNewSecret = !existing || existing.mode !== selectedMode;
+  document.querySelector('#server-url-field').hidden = full;
+  document.querySelector('#stream-key-field').hidden = full;
+  document.querySelector('#push-url-field').hidden = !full;
+  document.querySelector('#server-url').required = !full;
+  document.querySelector('#stream-key').required = !full && needsNewSecret;
+  document.querySelector('#push-url').required = full && needsNewSecret;
+}
+
+function openDestinationDialog(item = null) {
+  clearDialogError(elements.destinationDialog);
+  state.editingDestinationId = item?.id || null;
   document.querySelector('#destination-id').value = item?.id || '';
   document.querySelector('#destination-name').value = item?.name || '';
+  document.querySelector('#destination-mode').value = item?.mode || 'serverKey';
   document.querySelector('#server-url').value = item?.serverUrl || '';
   document.querySelector('#stream-key').value = '';
   document.querySelector('#stream-key').type = 'password';
+  document.querySelector('#push-url').value = '';
+  document.querySelector('#push-url').type = 'password';
   document.querySelector('#destination-enabled').checked = item?.enabled ?? true;
-  document.querySelector('#stream-key').required = !item;
+  renderDestinationRouteOptions(item?.id || null);
+  updateDestinationMode();
   updateDialogCopy();
-  state.dialogInitial = dialogSnapshot();
-  elements.dialog.showModal();
+  state.snapshots.destination = destinationSnapshot();
+  elements.destinationDialog.showModal();
   document.querySelector('#destination-name').focus();
 }
 
-function requestDialogClose() {
+function requestDialogClose(dialog, snapshotName, snapshotFunction) {
   if (state.saving) return;
-  const hasChanges = state.dialogInitial !== null && dialogSnapshot() !== state.dialogInitial;
+  const hasChanges = state.snapshots[snapshotName] !== undefined && snapshotFunction() !== state.snapshots[snapshotName];
   if (hasChanges && !window.confirm(t('dialog.discardConfirm'))) return;
-  elements.dialog.close('cancel');
+  dialog.close('cancel');
 }
 
 function serializableDestinations() {
-  return state.destinations.map((item) => ({
+  return state.config.destinations.map((item) => ({
     id: item.id,
     name: item.name,
-    serverUrl: item.serverUrl,
-    streamKey: item.streamKey || '',
+    mode: item.mode,
+    ...(item.mode === 'fullUrl' ? { pushUrl: item.pushUrl || '' } : { serverUrl: item.serverUrl, streamKey: item.streamKey || '' }),
     enabled: item.enabled,
   }));
 }
 
-async function saveAll(destinations, successMessage) {
+function serializableConfig(overrides = {}) {
+  return {
+    version: state.config.version,
+    revision: state.config.revision,
+    settings: overrides.settings || state.config.settings,
+    routes: overrides.routes || state.config.routes,
+    destinations: overrides.destinations || serializableDestinations(),
+  };
+}
+
+async function saveConfig(overrides, successMessage) {
   const payload = await api('/api/config', {
     method: 'PUT',
-    body: JSON.stringify({ destinations }),
+    body: JSON.stringify(serializableConfig(overrides)),
   });
-  state.destinations = payload.config.destinations;
-  renderDestinations();
-  showToast(payload.warning ? `${successMessage} ${payload.warning}` : successMessage);
+  state.config = payload.config;
+  renderAllConfig();
+  const warning = payload.warningCode ? t(`toast.warning.${payload.warningCode}`) : '';
+  showToast(warning ? `${successMessage} ${warning}` : successMessage);
   await refreshStatus();
 }
 
 async function handleFormSubmit(event) {
   event.preventDefault();
-  if (!elements.form.reportValidity()) return;
+  if (!elements.destinationForm.reportValidity()) return;
   const destination = {
     id: document.querySelector('#destination-id').value,
     name: document.querySelector('#destination-name').value.trim(),
+    mode: document.querySelector('#destination-mode').value,
     serverUrl: document.querySelector('#server-url').value.trim(),
     streamKey: document.querySelector('#stream-key').value,
+    pushUrl: document.querySelector('#push-url').value,
     enabled: document.querySelector('#destination-enabled').checked,
   };
   const destinations = serializableDestinations();
   const index = destinations.findIndex((item) => item.id === destination.id);
   if (index >= 0) destinations[index] = destination;
   else destinations.push(destination);
+  const selectedRouteIds = new Set([...document.querySelectorAll('#destination-route-options input:checked')].map((input) => input.value));
+  const destinationId = destination.id || '__new__';
+  const routes = state.config.routes.map((route) => {
+    const ids = route.destinationIds.filter((id) => id !== destination.id);
+    if (selectedRouteIds.has(route.id)) ids.push(destinationId);
+    return { ...route, destinationIds: ids };
+  });
 
   state.saving = true;
-  elements.save.disabled = true;
-  elements.cancel.disabled = true;
-  elements.close.disabled = true;
-  elements.save.textContent = t('dialog.saving');
+  const controls = ['#save-destination', '#cancel-destination', '#close-dialog'].map((selector) => document.querySelector(selector));
+  controls.forEach((control) => { control.disabled = true; });
+  controls[0].textContent = t('dialog.saving');
   try {
-    await saveAll(destinations, t('toast.configSaved'));
-    elements.dialog.close('saved');
+    if (!destination.id) {
+      destination.id = newId();
+      routes.forEach((route) => { route.destinationIds = route.destinationIds.map((id) => id === '__new__' ? destination.id : id); });
+      destinations[destinations.length - 1] = destination;
+    }
+    await saveConfig({ destinations, routes }, t('toast.configSaved'));
+    elements.destinationDialog.close('saved');
   } catch (error) {
-    showToast(error.message, true);
+    showDialogError(elements.destinationDialog, error.message);
   } finally {
     state.saving = false;
-    elements.save.disabled = false;
-    elements.cancel.disabled = false;
-    elements.close.disabled = false;
-    elements.save.textContent = t('dialog.save');
+    controls.forEach((control) => { control.disabled = false; });
+    controls[0].textContent = t('dialog.save');
   }
 }
 
@@ -565,25 +856,120 @@ async function handleCardAction(event) {
   const button = event.target.closest('button[data-action]');
   if (!button) return;
   const card = button.closest('[data-id]');
-  const item = state.destinations.find((destination) => destination.id === card.dataset.id);
+  if (button.dataset.action === 'expand-routes') {
+    card.querySelectorAll('.route-chip-overflow').forEach((chip) => { chip.hidden = false; });
+    button.remove();
+    return;
+  }
+  const item = state.config.destinations.find((destination) => destination.id === card.dataset.id);
   if (!item) return;
   if (button.dataset.action === 'edit') {
-    openDialog(item);
+    openDestinationDialog(item);
     return;
   }
   if (button.dataset.action === 'delete' && !window.confirm(t('destination.deleteConfirm', { name: item.name }))) return;
 
   const destinations = serializableDestinations();
+  let routes = state.config.routes;
   if (button.dataset.action === 'delete') {
     destinations.splice(destinations.findIndex((destination) => destination.id === item.id), 1);
+    routes = routes.map((route) => ({ ...route, destinationIds: route.destinationIds.filter((id) => id !== item.id) }));
   } else {
     destinations.find((destination) => destination.id === item.id).enabled = !item.enabled;
   }
   try {
-    await saveAll(destinations, t(button.dataset.action === 'delete' ? 'toast.deleted' : 'toast.stateUpdated'));
+    await saveConfig({ destinations, routes }, t(button.dataset.action === 'delete' ? 'toast.deleted' : 'toast.stateUpdated'));
   } catch (error) {
     showToast(error.message, true);
   }
+}
+
+function routeSnapshot() {
+  return JSON.stringify({
+    name: document.querySelector('#route-name').value,
+    application: document.querySelector('#route-application').value,
+    enabled: document.querySelector('#route-enabled').checked,
+    allowPlay: document.querySelector('#route-allow-play').checked,
+    idleStreams: document.querySelector('#route-idle-streams').checked,
+    waitKey: document.querySelector('#route-wait-key').checked,
+    dropIdlePublisherSeconds: document.querySelector('#route-drop-idle').value,
+    pushReconnectSeconds: document.querySelector('#route-reconnect').value,
+  });
+}
+
+function openRouteDialog(item = null) {
+  clearDialogError(elements.routeDialog);
+  state.editingRouteId = item?.id || null;
+  document.querySelector('#route-dialog-title').textContent = t(item ? 'routeDialog.editTitle' : 'routeDialog.addTitle');
+  document.querySelector('#route-id').value = item?.id || '';
+  document.querySelector('#route-name').value = item?.name || '';
+  document.querySelector('#route-application').value = item?.application || '';
+  document.querySelector('#route-enabled').checked = item?.enabled ?? true;
+  document.querySelector('#route-allow-play').checked = item?.allowPlay ?? true;
+  document.querySelector('#route-idle-streams').checked = item?.idleStreams ?? false;
+  document.querySelector('#route-wait-key').checked = item?.waitKey ?? false;
+  document.querySelector('#route-drop-idle').value = item?.dropIdlePublisherSeconds ?? 0;
+  document.querySelector('#route-reconnect').value = item?.pushReconnectSeconds ?? 1;
+  state.snapshots.route = routeSnapshot();
+  elements.routeDialog.showModal();
+  document.querySelector('#route-name').focus();
+}
+
+async function handleRouteSubmit(event) {
+  event.preventDefault();
+  if (!elements.routeForm.reportValidity()) return;
+  const route = {
+    id: document.querySelector('#route-id').value || newId(),
+    name: document.querySelector('#route-name').value.trim(),
+    application: document.querySelector('#route-application').value.trim(),
+    enabled: document.querySelector('#route-enabled').checked,
+    allowPlay: document.querySelector('#route-allow-play').checked,
+    idleStreams: document.querySelector('#route-idle-streams').checked,
+    waitKey: document.querySelector('#route-wait-key').checked,
+    dropIdlePublisherSeconds: Number(document.querySelector('#route-drop-idle').value),
+    pushReconnectSeconds: Number(document.querySelector('#route-reconnect').value),
+    destinationIds: state.config.routes.find((item) => item.id === state.editingRouteId)?.destinationIds || [],
+  };
+  const routes = state.config.routes.map((item) => ({ ...item }));
+  const index = routes.findIndex((item) => item.id === route.id);
+  if (index >= 0) routes[index] = route; else routes.push(route);
+  try {
+    await saveConfig({ routes }, t('toast.configSaved'));
+    elements.routeDialog.close('saved');
+  } catch (error) { showDialogError(elements.routeDialog, error.message); }
+}
+
+async function handleRouteAction(event) {
+  const button = event.target.closest('button[data-action]');
+  if (!button) return;
+  const item = state.config.routes.find((route) => route.id === button.closest('[data-id]').dataset.id);
+  if (!item) return;
+  if (button.dataset.action === 'edit') return openRouteDialog(item);
+  if (button.dataset.action === 'delete' && !window.confirm(t('routeDialog.deleteConfirm', { name: item.name }))) return;
+  let routes = state.config.routes.map((route) => ({ ...route }));
+  if (button.dataset.action === 'delete') routes = routes.filter((route) => route.id !== item.id);
+  else routes.find((route) => route.id === item.id).enabled = !item.enabled;
+  try { await saveConfig({ routes }, t('toast.stateUpdated')); } catch (error) { showToast(error.message, true); }
+}
+
+function settingsSnapshot() {
+  return JSON.stringify({ chunkSize: document.querySelector('#setting-chunk-size').value, pingSeconds: document.querySelector('#setting-ping').value, pingTimeoutSeconds: document.querySelector('#setting-ping-timeout').value });
+}
+
+function openSettingsDialog() {
+  clearDialogError(elements.settingsDialog);
+  document.querySelector('#setting-chunk-size').value = state.config.settings.chunkSize;
+  document.querySelector('#setting-ping').value = state.config.settings.pingSeconds;
+  document.querySelector('#setting-ping-timeout').value = state.config.settings.pingTimeoutSeconds;
+  state.snapshots.settings = settingsSnapshot();
+  elements.settingsDialog.showModal();
+}
+
+async function handleSettingsSubmit(event) {
+  event.preventDefault();
+  if (!elements.settingsForm.reportValidity()) return;
+  const settings = { chunkSize: Number(document.querySelector('#setting-chunk-size').value), pingSeconds: Number(document.querySelector('#setting-ping').value), pingTimeoutSeconds: Number(document.querySelector('#setting-ping-timeout').value) };
+  try { await saveConfig({ settings }, t('toast.configSaved')); elements.settingsDialog.close('saved'); } catch (error) { showDialogError(elements.settingsDialog, error.message); }
 }
 
 function formatRate(bitsPerSecond) {
@@ -742,7 +1128,7 @@ function renderStatus(status) {
   document.querySelector('#gateway-status').textContent = t(online ? 'metrics.online' : 'metrics.offline');
   document.querySelector('#gateway-detail').textContent = t(online ? 'metrics.nginxHealthy' : 'metrics.checkLogs');
   document.querySelector('#stream-count').textContent = streams.length;
-  document.querySelector('#stream-detail').textContent = streams.length ? t('metrics.receiving', { name: streams[0].name }) : t('metrics.noStream');
+  document.querySelector('#stream-detail').textContent = streams.length ? t('metrics.receiving', { name: `${streams[0].application}/${streams[0].name}` }) : t('metrics.noStream');
   document.querySelector('#destination-count').textContent = status.enabledDestinations || 0;
   document.querySelector('#live-badge').textContent = t(streams.length ? 'ingest.live' : 'ingest.waiting');
   document.querySelector('#live-badge').className = `live-badge${streams.length ? ' live' : ''}`;
@@ -751,7 +1137,7 @@ function renderStatus(status) {
   document.querySelector('#stream-list').innerHTML = streams.length ? streams.map((stream, index) => `
     <article class="stream-card" data-stream-index="${index}">
       <header class="stream-card-head">
-        <div><span>${escapeHtml(t('streams.name'))}</span><strong>${escapeHtml(stream.name)}</strong></div>
+        <div><span>${escapeHtml(t('streams.name'))}</span><strong>/${escapeHtml(stream.application)}/${escapeHtml(stream.name)}</strong></div>
         <span class="stream-state${stream.active ? ' active' : ''}">${escapeHtml(t(stream.active ? 'streams.active' : 'streams.idle'))}</span>
       </header>
       <div class="stream-overview">
@@ -790,8 +1176,9 @@ function applyLanguage(locale) {
     });
   });
   saveUiSettings({ locale: state.locale });
-  renderDestinations();
+  renderAllConfig();
   updateDialogCopy();
+  document.querySelector('#route-dialog-title').textContent = t(state.editingRouteId ? 'routeDialog.editTitle' : 'routeDialog.addTitle');
   if (state.status) renderStatus(state.status);
   else renderPendingStatus();
 }
@@ -808,48 +1195,75 @@ async function refreshStatus() {
 
 async function initialize() {
   applyLanguage(state.locale);
-  const host = window.location.hostname || 'localhost';
-  document.querySelector('#ingest-url').textContent = `rtmp://${host}:1935/live`;
   try {
     const config = await api('/api/config');
-    state.destinations = config.destinations;
-    renderDestinations();
+    state.config = config;
+    renderAllConfig();
   } catch (error) {
     showToast(error.message, true);
   }
   await refreshStatus();
-  setInterval(refreshStatus, 5000);
+  const scheduleRefresh = async () => {
+    await refreshStatus();
+    setTimeout(scheduleRefresh, 5000);
+  };
+  setTimeout(scheduleRefresh, 5000);
 }
 
-document.querySelector('#add-destination').addEventListener('click', () => openDialog());
-document.querySelector('#empty-add').addEventListener('click', () => openDialog());
-elements.form.addEventListener('submit', handleFormSubmit);
-elements.list.addEventListener('click', handleCardAction);
+document.querySelector('#add-destination').addEventListener('click', () => openDestinationDialog());
+document.querySelector('#empty-add').addEventListener('click', () => openDestinationDialog());
+document.querySelector('#add-route').addEventListener('click', () => openRouteDialog());
+document.querySelector('#open-settings').addEventListener('click', openSettingsDialog);
+elements.destinationForm.addEventListener('submit', handleFormSubmit);
+elements.routeForm.addEventListener('submit', handleRouteSubmit);
+elements.settingsForm.addEventListener('submit', handleSettingsSubmit);
+[elements.destinationForm, elements.routeForm, elements.settingsForm].forEach((form) => {
+  form.addEventListener('input', () => clearDialogError(form.closest('dialog')));
+  form.addEventListener('change', () => clearDialogError(form.closest('dialog')));
+});
+elements.destinationList.addEventListener('click', handleCardAction);
+elements.routeList.addEventListener('click', handleRouteAction);
 document.querySelector('#stream-list').addEventListener('click', (event) => {
   const button = event.target.closest('button[data-action="toggle-ips"]');
   if (!button) return;
   state.revealClientIps = !state.revealClientIps;
   if (state.status) renderStatus(state.status);
 });
-elements.cancel.addEventListener('click', requestDialogClose);
-elements.close.addEventListener('click', requestDialogClose);
-elements.dialog.addEventListener('cancel', (event) => {
+document.querySelector('#cancel-destination').addEventListener('click', () => requestDialogClose(elements.destinationDialog, 'destination', destinationSnapshot));
+document.querySelector('#close-dialog').addEventListener('click', () => requestDialogClose(elements.destinationDialog, 'destination', destinationSnapshot));
+elements.destinationDialog.addEventListener('cancel', (event) => {
   event.preventDefault();
-  requestDialogClose();
+  requestDialogClose(elements.destinationDialog, 'destination', destinationSnapshot);
 });
-elements.dialog.addEventListener('close', () => {
-  state.editingId = null;
-  state.dialogInitial = null;
+elements.destinationDialog.addEventListener('close', () => {
+  state.editingDestinationId = null;
+  delete state.snapshots.destination;
 });
+document.querySelector('#cancel-route').addEventListener('click', () => requestDialogClose(elements.routeDialog, 'route', routeSnapshot));
+document.querySelector('#close-route-dialog').addEventListener('click', () => requestDialogClose(elements.routeDialog, 'route', routeSnapshot));
+elements.routeDialog.addEventListener('cancel', (event) => { event.preventDefault(); requestDialogClose(elements.routeDialog, 'route', routeSnapshot); });
+elements.routeDialog.addEventListener('close', () => { state.editingRouteId = null; delete state.snapshots.route; });
+document.querySelector('#cancel-settings').addEventListener('click', () => requestDialogClose(elements.settingsDialog, 'settings', settingsSnapshot));
+document.querySelector('#close-settings').addEventListener('click', () => requestDialogClose(elements.settingsDialog, 'settings', settingsSnapshot));
+elements.settingsDialog.addEventListener('cancel', (event) => { event.preventDefault(); requestDialogClose(elements.settingsDialog, 'settings', settingsSnapshot); });
+elements.settingsDialog.addEventListener('close', () => { delete state.snapshots.settings; });
 elements.language.addEventListener('change', (event) => applyLanguage(event.currentTarget.value));
+document.querySelector('#destination-mode').addEventListener('change', updateDestinationMode);
 document.querySelector('#toggle-key').addEventListener('click', (event) => {
   const input = document.querySelector('#stream-key');
   input.type = input.type === 'password' ? 'text' : 'password';
   event.currentTarget.textContent = t(input.type === 'password' ? 'dialog.show' : 'dialog.hide');
 });
-document.querySelector('#copy-url').addEventListener('click', async () => {
+document.querySelector('#toggle-push-url').addEventListener('click', (event) => {
+  const input = document.querySelector('#push-url');
+  input.type = input.type === 'password' ? 'text' : 'password';
+  event.currentTarget.textContent = t(input.type === 'password' ? 'dialog.show' : 'dialog.hide');
+});
+document.querySelector('#ingest-routes').addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-copy-url]');
+  if (!button) return;
   try {
-    await navigator.clipboard.writeText(document.querySelector('#ingest-url').textContent);
+    await navigator.clipboard.writeText(button.dataset.copyUrl);
     showToast(t('toast.copied'));
   } catch (_) {
     showToast(t('toast.copyFailed'), true);

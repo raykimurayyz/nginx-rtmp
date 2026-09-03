@@ -7,6 +7,8 @@
 
 [中文说明](README.zh-CN.md) · [Docker Hub](https://hub.docker.com/r/raykimurayyz/nginx-rtmp)
 
+> **Want to relay PS5 broadcasts to other platforms?** See [Game Live Bridge](https://github.com/raykimurayyz/game-live-bridge), a complete Docker Compose solution that combines local DNS redirection, RTMP relay, and live-comment forwarding.
+
 A self-hosted web interface for managing NGINX RTMP input applications and relay destinations. Receive streams from PlayStation workflows, OBS, cameras, hardware encoders, or other RTMP-capable sources, then route each input to the platforms you choose.
 
 ![RTMP Relay Manager dashboard](docs/images/dashboard-en.png)

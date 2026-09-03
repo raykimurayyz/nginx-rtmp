@@ -4,6 +4,10 @@ A lightweight, self-hosted RTMP relay with a web interface. Send video from OBS,
 
 **Documentation and source:** [github.com/raykimurayyz/nginx-rtmp](https://github.com/raykimurayyz/nginx-rtmp)
 
+> **Want to relay PS5 broadcasts to other platforms?** See [Game Live Bridge](https://hub.docker.com/r/raykimurayyz/game-live-bridge), a complete Docker Compose solution that combines local DNS redirection, RTMP relay, and live-comment forwarding.
+>
+> **需要将 PS5 直播转推到其他平台？** 请查看 [Game Live Bridge](https://hub.docker.com/r/raykimurayyz/game-live-bridge)。它是一套整合本地 DNS 重定向、RTMP 转推和直播弹幕转发的完整 Docker Compose 方案。
+
 ![RTMP Relay Manager dashboard](https://raw.githubusercontent.com/raykimurayyz/nginx-rtmp/main/docs/images/dashboard-en.png)
 
 ## How it works

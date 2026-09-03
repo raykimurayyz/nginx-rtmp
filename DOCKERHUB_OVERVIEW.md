@@ -6,6 +6,16 @@ A lightweight, self-hosted RTMP relay with a web interface. Send video from OBS,
 
 ![RTMP Relay Manager dashboard](https://raw.githubusercontent.com/raykimurayyz/nginx-rtmp/main/docs/images/dashboard-en.png)
 
+## How it works
+
+```text
+PlayStation /app ──┐                         ┌──> YouTube
+OBS /live ─────────┼──> RTMP Relay Manager ──┼──> Twitch
+Camera /camera ────┘                         └──> Other platforms
+```
+
+Each input route can be assigned independently to one or more destinations. A single incoming stream can therefore be relayed to multiple enabled platforms at the same time.
+
 ## What you can do
 
 - Manage multiple RTMP input applications, including the default `/app` and `/live` routes.

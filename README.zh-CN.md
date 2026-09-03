@@ -24,10 +24,12 @@
 ## 工作方式
 
 ```text
-PlayStation /app ──┐
-OBS /live ─────────┼──> RTMP Relay Manager ──> 选定的转推目的地
-摄像机 /camera ────┘
+PlayStation /app ──┐                         ┌──> 抖音
+OBS /live ─────────┼──> RTMP Relay Manager ──┼──> 斗鱼
+摄像机 /camera ────┘                         └──> 其他平台
 ```
+
+每条输入路由都可以独立绑定一个或多个转推目的地，因此同一路输入流能够同时转推到多个已启用的直播平台。
 
 应用使用 NGINX 和 nginx-rtmp-module 传输直播流，并通过轻量管理服务提供路由配置、参数检查、安全重载、配置恢复和运行状态。新安装默认启用 `app` 和 `live` 两条输入路由，但在页面绑定目的地前不会向外转推。
 

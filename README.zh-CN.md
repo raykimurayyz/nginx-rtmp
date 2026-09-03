@@ -7,6 +7,8 @@
 
 [English README](README.md) · [Docker Hub](https://hub.docker.com/r/raykimurayyz/nginx-rtmp)
 
+> **需要将 PS5 直播转推到其他平台？** 请查看 [Game Live Bridge](https://github.com/raykimurayyz/game-live-bridge)。它是一套完整的 Docker Compose 方案，整合了本地 DNS 重定向、RTMP 转推和直播弹幕转发。
+
 一个可自行部署的 NGINX RTMP 可视化管理工具。通过浏览器管理多个 RTMP Application 输入路由及其转推目的地，可接收 PlayStation 推流方案、OBS、摄像机、硬件编码器及其他支持 RTMP 的视频源。
 
 ![RTMP Relay Manager 管理界面](docs/images/dashboard-zh-CN.png)

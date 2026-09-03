@@ -8,8 +8,9 @@ A lightweight, self-hosted RTMP relay with a web interface. Send video from OBS,
 
 ## What you can do
 
-- Receive one local RTMP input and relay it to multiple destinations.
-- Add, edit, enable, disable, and remove platforms from a browser.
+- Manage multiple RTMP input applications, including the default `/app` and `/live` routes.
+- Route each input independently to the destinations you select.
+- Add, edit, enable, disable, and remove routes and platforms from a browser.
 - Monitor live bitrate, transferred traffic, media metadata, and RTMP connections.
 - Keep destination configuration when the container is replaced or upgraded.
 - Use English, Japanese, or Simplified Chinese automatically based on browser preferences.
@@ -27,6 +28,8 @@ docker run -d \
   --restart unless-stopped \
   --security-opt no-new-privileges:true \
   --cap-drop ALL \
+  --read-only \
+  --tmpfs /tmp:rw,noexec,nosuid,size=64m \
   -p 1935:1935 \
   -p 8080:8080 \
   -v nginx-rtmp-data:/data \
@@ -39,16 +42,18 @@ Open the management page:
 http://YOUR_DOCKER_HOST:8080
 ```
 
-Add the RTMP server URL and stream key supplied by each destination platform.
+Create or edit input routes, then add the server URL and stream key—or a complete RTMP push URL—supplied by each destination platform. Select which routes should relay to each destination.
 
-Configure OBS or another publisher:
+Configure OBS or another publisher with the default generic route:
 
 ```text
 Server:     rtmp://YOUR_DOCKER_HOST:1935/live
 Stream key: main
 ```
 
-Start streaming. The input is automatically relayed to every enabled destination.
+For a compatible PlayStation interception workflow, use `rtmp://YOUR_DOCKER_HOST:1935/app`. You can create additional application paths in the browser.
+
+Start streaming. Each input is automatically relayed to its selected, enabled destinations.
 
 ## Docker Compose
 
@@ -65,6 +70,9 @@ services:
       - "8080:8080"
     volumes:
       - nginx-rtmp-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -89,13 +97,13 @@ docker compose logs -f
 
 ## Persistent configuration
 
-The application stores destinations and stream keys in:
+The application stores input routes, server settings, destinations, and secrets in:
 
 ```text
 /data/config.json
 ```
 
-Mount `/data` from a named volume as shown above. The volume exists independently of the container, so configuration remains available after the image or container is replaced.
+Mount `/data` from a named volume as shown above. The volume exists independently of the container, so configuration remains available after the image or container is replaced. A backup of the previous valid configuration is kept at `/data/config.json.backup`, and older version 1 configurations are migrated automatically.
 
 Do not run `docker compose down -v` unless you intentionally want to delete the saved configuration.
 

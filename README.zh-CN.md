@@ -7,13 +7,14 @@
 
 [English README](README.md) · [Docker Hub](https://hub.docker.com/r/raykimurayyz/nginx-rtmp)
 
-一个可自行部署的 RTMP 多平台直播转推工具。它可以接收来自 OBS、PlayStation 4/5 或 Xbox 等游戏主机推流方案、摄像机、硬件编码器以及其他支持 RTMP 的视频源，再通过网页将一路直播流同时转发到多个直播平台。
+一个可自行部署的 NGINX RTMP 可视化管理工具。通过浏览器管理多个 RTMP Application 输入路由及其转推目的地，可接收 PlayStation 推流方案、OBS、摄像机、硬件编码器及其他支持 RTMP 的视频源。
 
 ![RTMP Relay Manager 管理界面](docs/images/dashboard-zh-CN.png)
 
 ## 为什么使用它？
 
-- **只推一路，同时转发到多个平台。** 输入端无需分别连接每个直播平台。
+- **管理多组输入路由。** PlayStation 劫持方案可以使用 `/app`，普通推流端可以使用 `/live`，也可以创建自己的 Application 路径。
+- **每路独立转推。** 不同 Application 可以绑定不同直播平台。
 - **不需要手动编辑 NGINX。** 在网页中添加、编辑、启用、停用或删除转推目的地。
 - **随时查看直播状态。** 监控输入/输出码率、累计流量、媒体参数、活动流和 RTMP 连接。
 - **升级镜像不丢配置。** 目的地和串流密钥保存在 Docker 管理的数据卷中，不在可随时替换的容器内。
@@ -23,17 +24,12 @@
 ## 工作方式
 
 ```text
-OBS / PlayStation 或 Xbox 主机方案 / 摄像机 / RTMP 编码器
-                              |
-                              | 一路 RTMP 直播流
-                              v
-                    RTMP Relay Manager
-                     /        |        \
-                    v         v         v
-                 平台 A    平台 B    平台 C
+PlayStation /app ──┐
+OBS /live ─────────┼──> RTMP Relay Manager ──> 选定的转推目的地
+摄像机 /camera ────┘
 ```
 
-应用使用 NGINX 和 nginx-rtmp-module 传输直播流，并通过轻量管理服务提供网页、参数检查、配置重载和运行状态。
+应用使用 NGINX 和 nginx-rtmp-module 传输直播流，并通过轻量管理服务提供路由配置、参数检查、安全重载、配置恢复和运行状态。新安装默认启用 `app` 和 `live` 两条输入路由，但在页面绑定目的地前不会向外转推。
 
 游戏主机通常需要通过兼容的采集卡、直播软件或硬件编码器接入。能否原生填写自定义 RTMP 地址，取决于具体主机和所使用的软件。
 
@@ -56,6 +52,9 @@ services:
       - "8080:8080"
     volumes:
       - nginx-rtmp-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -81,6 +80,8 @@ docker run -d \
   --restart unless-stopped \
   --security-opt no-new-privileges:true \
   --cap-drop ALL \
+  --read-only \
+  --tmpfs /tmp:rw,noexec,nosuid,size=64m \
   -p 1935:1935 \
   -p 8080:8080 \
   -v nginx-rtmp-data:/data \
@@ -95,18 +96,27 @@ http://你的Docker主机IP:8080
 
 ## 开始直播
 
-### 1. 添加直播平台
+### 1. 检查或创建输入路由
+
+默认输入路由：
+
+- **PlayStation** — `rtmp://你的Docker主机IP:1935/app`
+- **Generic RTMP** — `rtmp://你的Docker主机IP:1935/live`
+
+可以在页面中添加、编辑、启用或删除路由。需要使用 OBS 或 VLC 拉取输入流时，请开启“允许本地拉流”。
+
+### 2. 添加直播平台
 
 打开管理页面，点击 **添加平台**，填写直播平台提供的两个参数：
 
-- **RTMP 服务器地址**，例如 `rtmp://live-push.example.com/live`
-- **串流密钥**，例如 `abc123-secret`
+- 平台分别提供的 **RTMP 服务器地址和串流密钥**；或者
+- 已经包含密钥或查询参数的 **完整 RTMP 推流地址**。
 
-启用并保存该目的地。每个需要接收直播的平台都可以单独添加。
+选择需要绑定的输入路由，启用并保存目的地。
 
 ![添加转推目的地](docs/images/destination-dialog-zh-CN.png)
 
-### 2. 配置 OBS 或其他推流端
+### 3. 配置推流端
 
 填写以下输入参数：
 
@@ -115,9 +125,9 @@ http://你的Docker主机IP:8080
 串流密钥：main
 ```
 
-本地串流密钥可以是任意自定义流名称。它和网页中填写的各直播平台串流密钥不是同一个参数。
+本地串流密钥可以是任意自定义流名称，它和直播平台串流密钥不是同一个参数。PlayStation Twitch 劫持方案会推向 `app` Application，并通常自动提供类似 `live_...` 的动态串流名称。
 
-### 3. 开始推流
+### 4. 开始推流
 
 从 OBS 或其他推流端开始直播后，RTMP Relay Manager 会自动把输入流转发到所有已启用的目的地。管理页面每 5 秒刷新一次流量和连接信息。
 
@@ -141,7 +151,7 @@ http://你的Docker主机IP:8080
 
 ## 配置持久化与升级
 
-目的地和串流密钥保存在 `/data/config.json`。上面的示例使用 Docker 管理的 `nginx-rtmp-data` 数据卷挂载 `/data`，所以替换或升级容器不会删除已保存配置。
+输入路由、服务器参数、转推目的地和密钥保存在 `/data/config.json`。系统还会保留上一份有效配置 `/data/config.json.backup` 用于自动恢复。Version 1 配置会在首次启动时自动迁移。
 
 升级 Compose 部署：
 
@@ -216,7 +226,7 @@ python3 -m unittest discover -s tests -v
 ```text
 app/server.py          管理 API、配置保存、NGINX 检查和重载
 app/static/            网页管理界面
-nginx/nginx.conf       固定的 NGINX 与 RTMP 配置
+nginx/nginx.conf       固定的 NGINX 基础配置和动态路由引用
 tests/                 单元测试
 .github/workflows/     CI 和 Docker Hub 镜像发布
 Dockerfile             可复现的上游组件构建和运行镜像
@@ -232,7 +242,7 @@ Docker Hub 发布流水线只会由严格的 `vX.Y.Z` Git 标签或手动执行�
 | 组件 | 版本 | 来源 |
 | --- | --- | --- |
 | Alpine Linux | 3.24 | Alpine 官方镜像 |
-| NGINX | 1.30.3 stable | `nginx.org` 官方发布包 |
+| NGINX | 1.30.4 stable | `nginx.org` 官方发布包 |
 | nginx-rtmp-module | 1.2.2 | 上游正式标签对应的固定提交 |
 
 Dockerfile 固定了下载文件的 SHA-256 和 RTMP 模块的准确提交。许可证信息参见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。

@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A local dashboard for relaying one RTMP stream to multiple platforms." data-i18n-content="meta.description">
+    <meta name="description" content="A local dashboard for managing RTMP input applications and relay destinations." data-i18n-content="meta.description">
     <title>RTMP Relay Manager</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=20260903-2">
   </head>
   <body>
     <div class="page-shell">
@@ -39,13 +39,10 @@
           </div>
           <div class="ingest-card">
             <div class="ingest-card-head">
-              <span data-i18n="ingest.title">Local ingest URL</span>
+              <span data-i18n="ingest.title">Local ingest routes</span>
               <span class="live-badge" id="live-badge">Waiting for stream</span>
             </div>
-            <div class="url-box">
-              <code id="ingest-url">rtmp://localhost:1935/live</code>
-              <button class="icon-button" id="copy-url" type="button" aria-label="Copy ingest URL" title="Copy" data-i18n="ingest.copy" data-i18n-aria-label="ingest.copyAria" data-i18n-title="ingest.copy">Copy</button>
-            </div>
+            <div id="ingest-routes" class="ingest-routes"></div>
             <p data-i18n="ingest.description">Use this server URL in your streaming software. The stream name can be customized.</p>
           </div>
         </section>
@@ -66,6 +63,26 @@
             <strong id="destination-count">0</strong>
             <small data-i18n="metrics.destinationsDetail">Concurrent relay supported</small>
           </article>
+        </section>
+
+        <section class="workspace route-workspace">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" data-i18n="routes.eyebrow">INPUT ROUTES</p>
+              <h2 data-i18n="routes.title">RTMP applications</h2>
+              <p data-i18n="routes.description">Create one application path for each input workflow and choose where it should be relayed.</p>
+            </div>
+            <div class="heading-actions">
+              <button class="secondary-button" id="open-settings" type="button" data-i18n="settings.open">Server settings</button>
+              <button class="primary-button" id="add-route" type="button"><span>＋</span> <span data-i18n="routes.add">Add input route</span></button>
+            </div>
+          </div>
+          <div class="route-list" id="route-list"></div>
+          <div class="empty-state compact-empty" id="route-empty">
+            <div class="empty-icon">⇥</div>
+            <h3 data-i18n="routes.emptyTitle">No input routes</h3>
+            <p data-i18n="routes.emptyDescription">Add an RTMP application before publishing a stream.</p>
+          </div>
         </section>
 
         <section class="workspace">
@@ -128,11 +145,18 @@
           <input id="destination-name" maxlength="60" placeholder="For example: YouTube" required autocomplete="off" data-i18n-placeholder="dialog.namePlaceholder">
         </label>
         <label>
+          <span data-i18n="dialog.mode">Address format</span>
+          <select id="destination-mode">
+            <option value="serverKey" data-i18n="dialog.modeSeparate">Server URL and stream key</option>
+            <option value="fullUrl" data-i18n="dialog.modeFull">Complete RTMP push URL</option>
+          </select>
+        </label>
+        <label id="server-url-field">
           <span data-i18n="dialog.server">RTMP server URL</span>
           <input id="server-url" type="url" maxlength="1024" placeholder="rtmp://live-push.example.com/live" required spellcheck="false" autocomplete="off">
           <small data-i18n="dialog.serverHelp">Enter the server URL supplied by the platform. RTMP is currently supported.</small>
         </label>
-        <label>
+        <label id="stream-key-field">
           <span data-i18n="dialog.key">Stream key</span>
           <div class="secret-input">
             <input id="stream-key" type="password" maxlength="1024" placeholder="Enter the stream key supplied by the platform" spellcheck="false" autocomplete="new-password" data-i18n-placeholder="dialog.keyPlaceholder">
@@ -140,6 +164,19 @@
           </div>
           <small id="key-help">The key is stored only in the local Docker volume.</small>
         </label>
+        <label id="push-url-field" hidden>
+          <span data-i18n="dialog.fullUrl">Complete RTMP push URL</span>
+          <div class="secret-input">
+            <input id="push-url" type="password" maxlength="2048" placeholder="rtmp://example.com/app/key" spellcheck="false" autocomplete="new-password" data-i18n-placeholder="dialog.fullUrlPlaceholder">
+            <button type="button" id="toggle-push-url">Show</button>
+          </div>
+          <small id="push-url-help" data-i18n="dialog.fullUrlHelp">Use this when the platform provides one complete address containing its key or query parameters.</small>
+        </label>
+        <fieldset class="route-binding">
+          <legend data-i18n="dialog.routes">Input routes</legend>
+          <div id="destination-route-options" class="checkbox-list"></div>
+          <small data-i18n="dialog.routesHelp">Only selected input routes relay to this destination.</small>
+        </fieldset>
         <label class="switch-row">
           <span>
             <b data-i18n="dialog.enabled">Enable now</b>
@@ -147,6 +184,7 @@
           </span>
           <input id="destination-enabled" type="checkbox" checked>
         </label>
+        <div class="dialog-error" role="alert" tabindex="-1" hidden></div>
         <div class="dialog-actions">
           <button class="secondary-button" id="cancel-destination" type="button" data-i18n="dialog.cancel">Cancel</button>
           <button class="primary-button" id="save-destination" type="submit" data-i18n="dialog.save">Save and apply</button>
@@ -154,7 +192,42 @@
       </form>
     </dialog>
 
+    <dialog id="route-dialog">
+      <form method="dialog" id="route-form">
+        <div class="dialog-head">
+          <div><p class="eyebrow" data-i18n="routeDialog.eyebrow">INPUT ROUTE</p><h2 id="route-dialog-title">Add input route</h2></div>
+          <button class="close-button" id="close-route-dialog" aria-label="Close" type="button" data-i18n-aria-label="dialog.close">×</button>
+        </div>
+        <input type="hidden" id="route-id">
+        <label><span data-i18n="routeDialog.name">Route name</span><input id="route-name" maxlength="60" required autocomplete="off" placeholder="For example: PlayStation" data-i18n-placeholder="routeDialog.namePlaceholder"></label>
+        <label><span data-i18n="routeDialog.application">Application path</span><input id="route-application" maxlength="64" required pattern="[A-Za-z0-9_-]+" autocomplete="off" placeholder="app"><small data-i18n="routeDialog.applicationHelp">The path after the RTMP host, such as app or live.</small></label>
+        <label class="switch-row"><span><b data-i18n="routeDialog.enabled">Enable route</b><small data-i18n="routeDialog.enabledHelp">Accept new publishers on this application</small></span><input id="route-enabled" type="checkbox" checked></label>
+        <label class="switch-row"><span><b data-i18n="routeDialog.allowPlay">Allow local playback</b><small data-i18n="routeDialog.allowPlayHelp">Required when OBS or VLC needs to pull the incoming stream</small></span><input id="route-allow-play" type="checkbox" checked></label>
+        <details class="advanced-settings">
+          <summary data-i18n="routeDialog.advanced">Advanced RTMP settings</summary>
+          <label><span data-i18n="routeDialog.reconnect">Push reconnect delay (seconds)</span><input id="route-reconnect" type="number" min="1" max="300" value="1" required></label>
+          <label><span data-i18n="routeDialog.dropIdle">Drop idle publisher after (seconds)</span><input id="route-drop-idle" type="number" min="0" max="3600" value="0" required><small data-i18n="routeDialog.zeroDisabled">Use 0 to disable.</small></label>
+          <label class="switch-row"><span><b data-i18n="routeDialog.idleStreams">Allow idle streams</b></span><input id="route-idle-streams" type="checkbox"></label>
+          <label class="switch-row"><span><b data-i18n="routeDialog.waitKey">Wait for a video keyframe</b></span><input id="route-wait-key" type="checkbox"></label>
+        </details>
+        <div class="dialog-error" role="alert" tabindex="-1" hidden></div>
+        <div class="dialog-actions"><button class="secondary-button" id="cancel-route" type="button" data-i18n="dialog.cancel">Cancel</button><button class="primary-button" id="save-route" type="submit" data-i18n="dialog.save">Save and apply</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="settings-dialog">
+      <form method="dialog" id="settings-form">
+        <div class="dialog-head"><div><p class="eyebrow" data-i18n="settings.eyebrow">RTMP SERVER</p><h2 data-i18n="settings.title">Server settings</h2></div><button class="close-button" id="close-settings" aria-label="Close" type="button" data-i18n-aria-label="dialog.close">×</button></div>
+        <label><span data-i18n="settings.chunkSize">Chunk size</span><input id="setting-chunk-size" type="number" min="128" max="1048576" required></label>
+        <label><span data-i18n="settings.ping">Ping interval (seconds)</span><input id="setting-ping" type="number" min="1" max="3600" required></label>
+        <label><span data-i18n="settings.pingTimeout">Ping timeout (seconds)</span><input id="setting-ping-timeout" type="number" min="1" max="3600" required></label>
+        <p class="dialog-note" data-i18n="settings.portNote">The internal RTMP port remains 1935 because Docker port mappings cannot be changed from this page.</p>
+        <div class="dialog-error" role="alert" tabindex="-1" hidden></div>
+        <div class="dialog-actions"><button class="secondary-button" id="cancel-settings" type="button" data-i18n="dialog.cancel">Cancel</button><button class="primary-button" id="save-settings" type="submit" data-i18n="dialog.save">Save and apply</button></div>
+      </form>
+    </dialog>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="/app.js" defer></script>
+    <script src="/app.js?v=20260903-2" defer></script>
   </body>
 </html>

@@ -7,13 +7,14 @@
 
 [中文说明](README.zh-CN.md) · [Docker Hub](https://hub.docker.com/r/raykimurayyz/nginx-rtmp)
 
-A self-hosted web interface that receives one RTMP stream and relays it to multiple streaming platforms. Send video from OBS, a PlayStation 4/5 or Xbox streaming setup, a camera, a hardware encoder, or any other RTMP-capable source, then manage every destination from your browser.
+A self-hosted web interface for managing NGINX RTMP input applications and relay destinations. Receive streams from PlayStation workflows, OBS, cameras, hardware encoders, or other RTMP-capable sources, then route each input to the platforms you choose.
 
 ![RTMP Relay Manager dashboard](docs/images/dashboard-en.png)
 
 ## Why use it?
 
-- **Stream once, relay everywhere.** One local input can be forwarded to multiple RTMP platforms simultaneously.
+- **Manage multiple input routes.** Use `/app` for PlayStation interception workflows, `/live` for general publishers, or create your own RTMP application paths.
+- **Route each input independently.** Every application can relay to a different set of destinations.
 - **No manual NGINX editing.** Add, edit, enable, disable, and remove destinations from the web interface.
 - **See what is happening.** Monitor input/output bitrate, transferred traffic, media metadata, active streams, and RTMP connections.
 - **Keep configuration across upgrades.** Destinations and stream keys live in a Docker-managed volume, not in the disposable container.
@@ -23,17 +24,12 @@ A self-hosted web interface that receives one RTMP stream and relays it to multi
 ## How it works
 
 ```text
-OBS / PlayStation or Xbox setup / camera / RTMP encoder
-                          |
-                          | one RTMP stream
-                          v
-                RTMP Relay Manager
-                 /        |        \
-                v         v         v
-           Platform A  Platform B  Platform C
+PlayStation /app ──┐
+OBS /live ─────────┼──> RTMP Relay Manager ──> selected destinations
+Camera /camera ────┘
 ```
 
-The application uses NGINX with nginx-rtmp-module for media transport and a small management service for the web interface, validation, configuration reloads, and status reporting.
+The application uses NGINX with nginx-rtmp-module for media transport and a small management service for route configuration, validation, safe reloads, recovery, and status reporting. New installations include enabled `app` and `live` input routes; they have no relay destinations until you assign them in the browser.
 
 Game consoles generally connect through a compatible capture card, broadcasting application, or hardware encoder. Native support for a custom RTMP server depends on the console and software being used.
 
@@ -56,6 +52,9 @@ services:
       - "8080:8080"
     volumes:
       - nginx-rtmp-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -81,6 +80,8 @@ docker run -d \
   --restart unless-stopped \
   --security-opt no-new-privileges:true \
   --cap-drop ALL \
+  --read-only \
+  --tmpfs /tmp:rw,noexec,nosuid,size=64m \
   -p 1935:1935 \
   -p 8080:8080 \
   -v nginx-rtmp-data:/data \
@@ -95,18 +96,27 @@ http://YOUR_DOCKER_HOST:8080
 
 ## Start streaming
 
-### 1. Add your destination platforms
+### 1. Check or create an input route
+
+The default routes are:
+
+- **PlayStation** — `rtmp://YOUR_DOCKER_HOST:1935/app`
+- **Generic RTMP** — `rtmp://YOUR_DOCKER_HOST:1935/live`
+
+You can add, edit, enable, or remove routes in the web interface. Local playback can be enabled for workflows where OBS or VLC pulls the incoming stream.
+
+### 2. Add your destination platforms
 
 Open the management page, select **Add platform**, and enter the two values supplied by the streaming platform:
 
-- **RTMP server URL**, for example `rtmp://live-push.example.com/live`
-- **Stream key**, for example `abc123-secret`
+- **RTMP server URL and stream key**, for platforms that provide them separately; or
+- **Complete RTMP push URL**, for platforms that provide one address containing the key or query parameters.
 
-Enable the destination and save. Repeat this for every platform that should receive the stream.
+Select the input routes that should relay to the destination, enable it, and save.
 
 ![Add a relay destination](docs/images/destination-dialog-en.png)
 
-### 2. Configure OBS or another publisher
+### 3. Configure the publisher
 
 Use the following input settings:
 
@@ -115,9 +125,9 @@ Server:     rtmp://YOUR_DOCKER_HOST:1935/live
 Stream key: main
 ```
 
-The local stream key can be any stream name you choose. It is separate from the destination stream keys configured in the web interface.
+The local stream key can be any stream name you choose. It is separate from destination stream keys. A PlayStation Twitch-interception workflow publishes to the `app` application and normally supplies a generated stream name such as `live_...` automatically.
 
-### 3. Go live
+### 4. Go live
 
 Start streaming from the publisher. RTMP Relay Manager automatically forwards the input to every enabled destination. The dashboard refreshes every five seconds and shows live traffic and connection information.
 
@@ -141,7 +151,7 @@ The selected interface language is stored in the current browser. Full client IP
 
 ## Persistent configuration and upgrades
 
-Destinations and stream keys are stored in `/data/config.json`. The examples above mount `/data` from the Docker-managed `nginx-rtmp-data` volume, so replacing or upgrading the container does not remove the configuration.
+Input routes, server settings, destinations, and secrets are stored in `/data/config.json`. A previous valid configuration is retained as `/data/config.json.backup` for automatic recovery. Version 1 configurations are migrated automatically on first start.
 
 Upgrade a Compose deployment:
 
@@ -216,7 +226,7 @@ Project layout:
 ```text
 app/server.py          Management API, state, NGINX validation, and reload
 app/static/            Web interface
-nginx/nginx.conf       Fixed NGINX and RTMP configuration
+nginx/nginx.conf       Fixed NGINX base configuration and generated-route include
 tests/                 Unit tests
 .github/workflows/     CI and Docker Hub publishing
 Dockerfile             Reproducible upstream build and runtime image
@@ -232,7 +242,7 @@ This project does not vendor or modify NGINX or nginx-rtmp-module source code. V
 | Component | Version | Source |
 | --- | --- | --- |
 | Alpine Linux | 3.24 | Official Alpine image |
-| NGINX | 1.30.3 stable | `nginx.org` release archive |
+| NGINX | 1.30.4 stable | `nginx.org` release archive |
 | nginx-rtmp-module | 1.2.2 | Upstream tagged commit |
 
 Exact checksums and the RTMP module commit are pinned in the Dockerfile. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for licensing details.

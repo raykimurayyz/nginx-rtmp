@@ -3,7 +3,7 @@ services:
     build:
       context: .
       args:
-        NGINX_VERSION: "1.30.3"
+        NGINX_VERSION: "1.30.4"
         NGINX_RTMP_VERSION: "1.2.2"
     image: nginx-rtmp-relay-manager:local
     container_name: nginx-rtmp-relay-manager
@@ -13,6 +13,9 @@ services:
       - "8080:8080"
     volumes:
       - relay-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -20,4 +23,3 @@ services:
 
 volumes:
   relay-data:
-

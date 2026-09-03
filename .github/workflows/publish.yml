@@ -10,11 +10,34 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Validate release tag
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" != "tag" || ! "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Publishing requires a vX.Y.Z tag. For a manual run, select that tag as the workflow ref."
+            exit 1
+          fi
 
       - name: Resolve image name
         id: image
@@ -73,4 +96,4 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ steps.image.outputs.name }}
           readme-filepath: ./DOCKERHUB_OVERVIEW.md
-          short-description: A self-hosted web interface for relaying one RTMP stream to multiple platforms.
+          short-description: A self-hosted web interface for managing multiple RTMP inputs and relay destinations.

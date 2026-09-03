@@ -7,7 +7,7 @@ The MIT License in the repository root applies only to the original RTMP Relay M
 ## NGINX
 
 - Project: https://nginx.org/
-- Version: 1.30.3
+- Version: 1.30.4
 - License: 2-clause BSD license
 - License text: https://nginx.org/LICENSE
 
